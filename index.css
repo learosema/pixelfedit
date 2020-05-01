@@ -1,0 +1,30 @@
+body {
+  background: #222;
+  color: #fff;
+  font-family: sans-serif;
+  margin: 0 auto;
+  max-width: 800px;
+}
+
+header {
+  margin: 1em auto;
+  box-sizing: border-box;
+  border-radius: 1em;
+  background-image: linear-gradient(#000, #000),
+    linear-gradient(45deg, #f39, #f93, #129);
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
+  border: 0.5em solid transparent;
+  padding: 1em 1.5em;
+}
+
+h1 {
+  margin: 0;
+}
+
+main {
+  display: flex;
+  justify-content: space-around;
+  margin: 1em 0;
+  flex-wrap: wrap;
+}

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg version="1.2" baseProfile="tiny" viewBox="0 0 160 70"  xmlns="http://www.w3.org/2000/svg"
+    xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>Font example</title>
+    <desc>
+      There is a svg2ttf library. You have to use this deprecated syntax for it. https://www.w3.org/TR/SVGTiny12/fonts.html
+      Current browsers do not support this anymore, but you can use an old Safari (the last one available for Windows works).
+
+      I don't like this, maybe I should have a look into svg2ttf and make it work with a more modern svg symbol syntax :).
+    </desc>
+    <defs>
+        <font horiz-adv-x="500" xml:id="la">
+            <metadata>Lorem ipsum</metadata>
+            <font-face font-family="leatest" units-per-em="1000" ascent="703" descent="-300" alphabetic="0"/>
+            <missing-glyph horiz-adv-x="500" d="M63 0V700H438V0H63ZM125 63H375V638H125V63Z"/>
+            <glyph unicode="X" glyph-name="X" horiz-adv-x="385" d="M0 0 H100 V100 H0ZM100 100 H300 V400 H100Z"/>
+        </font>
+    </defs>
+    <text x="40" y="50" font-family="leatest" font-size="70" fill="#933">XXX</text>
+</svg>

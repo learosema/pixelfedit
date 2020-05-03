@@ -7,14 +7,6 @@ body {
 }
 
 header {
-  margin: 1em auto;
-  box-sizing: border-box;
-  border-radius: 1em;
-  background-image: linear-gradient(#000, #000),
-    linear-gradient(45deg, #f39, #f93, #129);
-  background-origin: border-box;
-  background-clip: padding-box, border-box;
-  border: 0.5em solid transparent;
   padding: 1em 1.5em;
   display: flex;
   flex-wrap: wrap;
@@ -34,6 +26,15 @@ main {
   justify-content: space-around;
   margin: 1em 0;
   flex-wrap: wrap;
+  margin: 1em auto;
+  padding: 1em 1.5em;
+  box-sizing: border-box;
+  border-radius: 1em;
+  background-image: linear-gradient(#000, #000),
+    linear-gradient(45deg, #f39, #f93, #129);
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
+  border: 0.5em solid transparent;
 }
 
 #symbols {

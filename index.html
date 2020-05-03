@@ -7,8 +7,71 @@
     <title>Document</title>
   </head>
   <body>
+    <svg id="symbols" viewBox="0 0 0 0">
+      <symbol id="disk" viewBox="0 0 128 128">
+        <path
+          stroke="currentColor"
+          stroke-width="4"
+          stroke-linecap="square"
+          stroke-linejoin="bevel"
+          fill="none"
+          d="M30 30 l52 0 l16 16 l0 52 l-68 0 l 0 -68 M40 30 l0 24 l36 0 l0 -24 M48 30 l0 16 l6 0 l0 -16 M40 98 l0 -30 l48 0 l0 30"
+        />
+      </symbol>
+      <symbol id="open" viewBox="0 0 128 128">
+        <path
+          stroke="currentColor"
+          stroke-width="4"
+          stroke-linecap="square"
+          stroke-linejoin="bevel"
+          fill="none"
+          d="M30,98 l15,-30 l60,0 l-15,30 l-60,0 l0,-45 l8,-8 l8,0 l8,8 l36,0 l0,15"
+        />
+      </symbol>
+      <symbol id="export" viewBox="0 0 128 128">
+        <path
+          stroke="currentColor"
+          stroke-width="4"
+          stroke-linecap="square"
+          stroke-linejoin="bevel"
+          fill="none"
+          d="M30,98 q60 0 60 -60 l-16,16 l 32,0 l -16,-16"
+        />
+      </symbol>
+    </svg>
     <header>
       <h1>PixelFedit</h1>
+      <nav>
+        <ul>
+          <li>
+            <a
+              ><svg class="icon">
+                <title>Open</title>
+                <use xlink:href="#open" />
+              </svg>
+              <span>open</span>
+            </a>
+          </li>
+          <li>
+            <a>
+              <svg class="icon">
+                <title>Save</title>
+                <use xlink:href="#disk" />
+              </svg>
+              <span>save</span>
+            </a>
+          </li>
+          <li>
+            <a>
+              <svg class="icon">
+                <title>export</title>
+                <use xlink:href="#export" />
+              </svg>
+              <span>export</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
     </header>
     <main>
       <div class="char-wrapper">

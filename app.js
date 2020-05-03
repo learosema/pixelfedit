@@ -135,6 +135,16 @@ function setup() {
     anchor.click();
   });
 
+  $("#menuExport").addEventListener("click", (e) => {
+    const anchor = document.createElement("a");
+    anchor.setAttribute("download", "test-svg.svg");
+    anchor.setAttribute(
+      "href",
+      "data:application/octet-stream;base64," + btoa(createSVG(state.font))
+    );
+    anchor.click();
+  });
+
   fontCanvas.addEventListener("click", (e) => {
     if (!state.font) {
       return;

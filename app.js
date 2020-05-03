@@ -10,6 +10,8 @@ const state = {
   currentChar: 65,
   pixelSize: 2,
   zoomPixelSize: 24,
+  x: 0,
+  y: 0,
 };
 
 function loadFont(fileName) {
@@ -85,16 +87,42 @@ function renderCharacter(state) {
   }
 }
 
+function setCanvasSizes(state) {
+  fontCanvas.width = 10 * state.pixelSize * 16;
+  fontCanvas.height = (state.numRows + 2) * state.pixelSize * 16;
+  charCanvas.width = 1 + 8 * (state.zoomPixelSize + 1);
+  charCanvas.height = 1 + state.numRows * (state.zoomPixelSize + 1);
+}
+
 function setup() {
-  loadFont("8X16.BIN").then((font) => {
+  const onLoadFont = (font) => {
     state.numRows = (font.length / 256) | 0;
     state.font = font;
-    fontCanvas.width = 10 * state.pixelSize * 16;
-    fontCanvas.height = (state.numRows + 2) * state.pixelSize * 16;
-    charCanvas.width = 1 + 9 * state.zoomPixelSize;
-    charCanvas.height = 1 + (state.numRows + 1) * state.zoomPixelSize;
+    setCanvasSizes(state);
     renderFontCanvas(state);
     renderCharacter(state);
+  };
+
+  loadFont("8X16.BIN").then(onLoadFont);
+
+  $("#menuOpen").addEventListener("click", (e) => {
+    console.log("muh", e, e.target);
+    const inputFile = $("#inputFile");
+    inputFile.click();
+  });
+
+  $("#inputFile").addEventListener("change", (e) => {
+    const file = $("#inputFile").files[0];
+    // TODO: if file.name ends with .png then try to import?
+    if (!file || file instanceof Blob === false) {
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      console.log(reader.result);
+      onLoadFont(new Uint8Array(reader.result));
+    };
+    reader.readAsArrayBuffer(file);
   });
 
   fontCanvas.addEventListener("click", (e) => {

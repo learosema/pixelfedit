@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="index.css" />
-    <title>Document</title>
+    <title>PixelFedit</title>
   </head>
   <body>
     <svg id="symbols" viewBox="0 0 0 0">
@@ -39,41 +39,48 @@
         />
       </symbol>
     </svg>
-    <header>
-      <h1>PixelFedit</h1>
-      <nav>
-        <ul>
-          <li>
-            <a
-              ><svg class="icon">
-                <title>Open</title>
-                <use xlink:href="#open" />
-              </svg>
-              <span>open</span>
-            </a>
-          </li>
-          <li>
-            <a>
-              <svg class="icon">
-                <title>Save</title>
-                <use xlink:href="#disk" />
-              </svg>
-              <span>save</span>
-            </a>
-          </li>
-          <li>
-            <a>
-              <svg class="icon">
-                <title>export</title>
-                <use xlink:href="#export" />
-              </svg>
-              <span>export</span>
-            </a>
-          </li>
-        </ul>
-      </nav>
+    <header class="header">
+      <h1 class="header__headline">PixelFedit</h1>
     </header>
-    <main>
+    <input
+      id="inputFile"
+      type="file"
+      class="hidden"
+      accept="application/octet-stream"
+    />
+    <nav class="navi">
+      <ul class="navi__list">
+        <li class="navi__list-item">
+          <a class="navi__anchor" id="menuOpen">
+            <svg class="icon">
+              <title>Open</title>
+              <use xlink:href="#open" />
+            </svg>
+            <span>open</span>
+          </a>
+        </li>
+        <li class="navi__list-item" id="menuSave">
+          <a class="navi__anchor">
+            <svg class="icon">
+              <title>Save</title>
+              <use xlink:href="#disk" />
+            </svg>
+            <span>save</span>
+          </a>
+        </li>
+        <li class="navi__list-item" id="menuExport">
+          <a class="navi__anchor">
+            <svg class="icon">
+              <title>export</title>
+              <use xlink:href="#export" />
+            </svg>
+            <span>export</span>
+          </a>
+        </li>
+      </ul>
+    </nav>
+
+    <main class="main">
       <div class="char-wrapper">
         <canvas class="char-canvas"></canvas>
       </div>

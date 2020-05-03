@@ -1,27 +1,97 @@
+@import url("https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap");
+
 body {
   background: #222;
   color: #fff;
   font-family: sans-serif;
+  line-height: 1.8;
   margin: 0 auto;
   max-width: 800px;
 }
 
-header {
+a {
+  color: deepskyblue;
+  text-decoration: none;
+}
+
+h1,
+h2,
+h3 {
+  font-family: "Press Start 2P", monospace;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+.hidden {
+  display: none;
+}
+
+#symbols {
+  position: absolute;
+  width: 0;
+  height: 0;
+}
+
+.header {
   padding: 1em 1.5em;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
 }
 
-nav {
-  flex-grow: 1;
-}
-
-h1 {
+.header__headline {
   margin: 0;
 }
 
-main {
+.navi {
+  position: sticky;
+  top: 0;
+  padding: 4px 0;
+  background: #000;
+  flex-grow: 1;
+}
+
+@media (min-width: 800px) {
+  .navi {
+    border-radius: 16px;
+  }
+}
+
+.navi__list {
+  list-style: none;
+  display: flex;
+  justify-content: flex-end;
+  padding: 0;
+  margin: 0;
+}
+
+.navi__anchor {
+  display: flex;
+  align-items: center;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 8px 16px;
+  text-decoration: none;
+  color: hotpink;
+  font-weight: bold;
+  border-radius: 8px;
+}
+
+.navi__anchor:hover {
+  color: #000;
+  background: hotpink;
+  text-decoration: none;
+}
+
+.icon {
+  display: block;
+  width: 32px;
+  height: 32px;
+}
+
+.main {
   display: flex;
   justify-content: space-around;
   margin: 1em 0;
@@ -37,43 +107,7 @@ main {
   border: 0.5em solid transparent;
 }
 
-#symbols {
-  position: absolute;
-  width: 0;
-  height: 0;
-}
-
-nav ul {
-  list-style: none;
-  display: flex;
-  justify-content: flex-end;
-  padding: 0;
-  margin: 0;
-}
-
-nav ul li a {
-  display: flex;
-  align-items: center;
-  font-size: 16px;
-}
-
-a {
-  border: none;
-  cursor: pointer;
-  padding: 4px 16px;
-  text-decoration: none;
-  color: hotpink;
-  font-weight: bold;
-  border-radius: 8px;
-}
-
-a:hover {
-  color: #000;
-  background: hotpink;
-}
-
-.icon {
+.char-canvas {
   display: block;
-  width: 32px;
-  height: 32px;
+  background: #444;
 }

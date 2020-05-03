@@ -106,7 +106,6 @@ function setup() {
   loadFont("8X16.BIN").then(onLoadFont);
 
   $("#menuOpen").addEventListener("click", (e) => {
-    console.log("muh", e, e.target);
     const inputFile = $("#inputFile");
     inputFile.click();
   });
@@ -123,6 +122,17 @@ function setup() {
       onLoadFont(new Uint8Array(reader.result));
     };
     reader.readAsArrayBuffer(file);
+  });
+
+  $("#menuSave").addEventListener("click", (e) => {
+    const anchor = document.createElement("a");
+    anchor.setAttribute("download", "awesome-font.bin");
+    anchor.setAttribute(
+      "href",
+      "data:application/octet-stream;base64," +
+        btoa(String.fromCharCode.apply(null, state.font))
+    );
+    anchor.click();
   });
 
   fontCanvas.addEventListener("click", (e) => {

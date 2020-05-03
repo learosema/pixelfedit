@@ -79,6 +79,10 @@ a:hover {
   border-radius: 8px;
 }
 
+.navi__anchor:disabled {
+  color: #777;
+}
+
 .navi__anchor:hover {
   color: #000;
   background: hotpink;

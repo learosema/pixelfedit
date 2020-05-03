@@ -16,6 +16,13 @@ header {
   background-clip: padding-box, border-box;
   border: 0.5em solid transparent;
   padding: 1em 1.5em;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+nav {
+  flex-grow: 1;
 }
 
 h1 {
@@ -38,6 +45,7 @@ main {
 nav ul {
   list-style: none;
   display: flex;
+  justify-content: flex-end;
   padding: 0;
   margin: 0;
 }
@@ -45,6 +53,7 @@ nav ul {
 nav ul li a {
   display: flex;
   align-items: center;
+  font-size: 16px;
 }
 
 a {
@@ -52,16 +61,18 @@ a {
   cursor: pointer;
   padding: 4px 16px;
   text-decoration: none;
-  color: #39f;
+  color: hotpink;
+  font-weight: bold;
+  border-radius: 8px;
 }
 
 a:hover {
-  color: #fff;
-  background: #000;
+  color: #000;
+  background: hotpink;
 }
 
 .icon {
   display: block;
-  width: 64px;
-  height: 64px;
+  width: 32px;
+  height: 32px;
 }

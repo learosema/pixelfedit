@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<svg version="1.2" baseProfile="tiny" viewBox="0 0 160 70"  xmlns="http://www.w3.org/2000/svg"
+<svg version="1.1" viewBox="0 0 160 70" xmlns="http://www.w3.org/2000/svg"
     xmlns:xlink="http://www.w3.org/1999/xlink">
     <title>Font example</title>
     <desc>
@@ -9,12 +8,12 @@
       I don't like this, maybe I should have a look into svg2ttf and make it work with a more modern svg symbol syntax :).
     </desc>
     <defs>
-        <font horiz-adv-x="500" xml:id="la">
+        <font horiz-adv-x="8" xml:id="Mu">
             <metadata>Lorem ipsum</metadata>
-            <font-face font-family="leatest" units-per-em="1000" ascent="703" descent="-300" alphabetic="0"/>
-            <missing-glyph horiz-adv-x="500" d="M63 0V700H438V0H63ZM125 63H375V638H125V63Z"/>
-            <glyph unicode="X" glyph-name="X" horiz-adv-x="385" d="M0 0 H100 V100 H0ZM100 100 H300 V400 H100Z"/>
+            <font-face font-family="leatest" units-per-em="16"/>
+            <missing-glyph d="M0 0 H8 V1 H0Z"/>
+            <glyph unicode="X" glyph-name="X" d="M0 15 H1 V16 H0ZM7 0 H8 V1 H7ZM0 0 H1 V1 H0Z M1 1 H2 V2 H1ZM2 2 H3 V3 H2ZM3 3 H4 V4 H3Z M4 4 H5 V5 H4 M5 5 H6 V6 H5Z M6 6 H7 V7 H6ZM7 7 H8 V8 H7Z"/>
         </font>
     </defs>
-    <text x="40" y="50" font-family="leatest" font-size="70" fill="#933">XXX</text>
+    <text x="0" y="70" font-family="leatest" font-size="64" fill="#933">XXyX</text>
 </svg>

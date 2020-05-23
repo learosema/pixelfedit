@@ -103,7 +103,7 @@ function setup() {
     renderCharacter(state);
   };
 
-  loadFont("8X16.BIN").then(onLoadFont);
+  loadFont("fonts/8X16.BIN").then(onLoadFont);
 
   $("#menuOpen").addEventListener("click", (e) => {
     const inputFile = $("#inputFile");

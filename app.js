@@ -20,6 +20,10 @@ function loadFont(fileName) {
     xhr.responseType = "arraybuffer";
     xhr.open("GET", fileName);
     xhr.onload = () => {
+      if (xhr.status !== 200) {
+        reject(xhr.statusText);
+        return;
+      }
       resolve(new Uint8Array(xhr.response));
     };
     xhr.onerror = (err) => reject(err);

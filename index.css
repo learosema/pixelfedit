@@ -67,6 +67,10 @@ a:hover {
   margin: 0;
 }
 
+.navi__list-item {
+  position: relative;
+}
+
 .navi__anchor {
   display: flex;
   align-items: center;
@@ -87,6 +91,25 @@ a:hover {
   color: #000;
   background: hotpink;
   text-decoration: none;
+}
+
+.navi__sub {
+  display: none;
+  list-style: none;
+  position: absolute;
+  background: rgba(255,255,255, .9);
+  color: black;
+  border: 4px solid #f7f;
+  border-radius: 16px;
+  padding: 16px;
+  top: 50px;
+  left: -4px;
+  width: 80px;
+  margin: 0;
+}
+
+.navi__list-item:hover .navi__sub {
+  display: block;
 }
 
 .icon {

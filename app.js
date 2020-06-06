@@ -6,6 +6,7 @@ const charCtx = charCanvas.getContext("2d");
 
 const state = {
   numRows: 8,
+  numCols: 8,
   font: null,
   currentChar: 65,
   pixelSize: 2,
@@ -140,6 +141,13 @@ function setup() {
   });
 
   $("#menuExport").addEventListener("click", (e) => {
+    $("#menuExport").classList.toggle("navi__list-item--open");
+    return;
+  });
+
+  $("#menuExportToSVG").addEventListener("click", (e) => {
+    $("#menuExport").classList.toggle("navi__list-item--open");
+    e.preventDefault();
     const anchor = document.createElement("a");
     anchor.setAttribute("download", "test-svg.svg");
     anchor.setAttribute(

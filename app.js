@@ -61,7 +61,7 @@ function loadOnlineFontList() {
           name: item.name,
           path: item.path,
           cols: 8,
-          rows: 3584 / 256,
+          rows: item.size / 256,
         }));
         resolve(data);
       } catch (ex) {

@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap");
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
 
 body {
   background: #222;
@@ -17,7 +17,7 @@ a {
 h1,
 h2,
 h3 {
-  font-family: "Press Start 2P", monospace;
+  font-family: 'Press Start 2P', monospace;
 }
 
 a:hover {
@@ -103,8 +103,8 @@ a:hover {
   border-radius: 16px;
   padding: 16px;
   top: 50px;
-  left: -8px;
-  width: 80px;
+  left: -4px;
+  width: auto;
   margin: 0;
 }
 

@@ -50,14 +50,19 @@
     />
     <nav class="navi">
       <ul class="navi__list">
-        <li class="navi__list-item">
-          <a class="navi__anchor" id="menuOpen">
+        <li class="navi__list-item" id="menuOpen">
+          <a class="navi__anchor">
             <svg class="icon">
               <title>Open</title>
               <use xlink:href="#open" />
             </svg>
             <span>open</span>
           </a>
+          <ul class="navi__sub" id="subMenuOpen">
+            <li class="navi__sub-item">
+              <a class="navi__sub-link" id="menuOpenLocal">local file</a>
+            </li>
+          </ul>
         </li>
         <li class="navi__list-item" id="menuSave">
           <a class="navi__anchor">
@@ -76,6 +81,14 @@
             </svg>
             <span>export</span>
           </a>
+          <ul class="navi__sub">
+            <li class="navi__sub-item">
+              <a class="navi__sub-link" id="menuExportToPNG">to PNG</a>
+            </li>
+            <li class="navi__sub-item">
+              <a class="navi__sub-link" id="menuExportToSVG">to SVG</a>
+            </li>
+          </ul>
         </li>
       </ul>
     </nav>
@@ -88,7 +101,9 @@
         <canvas class="font-canvas"></canvas>
       </div>
     </main>
+
     <script src="font-export/create-svg.js"></script>
+    <script src="font-export/create-png.js"></script>
     <script src="app.js"></script>
   </body>
 </html>

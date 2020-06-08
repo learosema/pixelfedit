@@ -210,6 +210,15 @@ function setup() {
     anchor.click();
   });
 
+  $('#menuExportToPNG').addEventListener('click', (e) => {
+    $('#menuExport').classList.toggle('navi__list-item--open');
+    e.preventDefault();
+    const anchor = document.createElement('a');
+    anchor.setAttribute('download', 'test-png.png');
+    anchor.setAttribute('href', createPNG(state.font));
+    anchor.click();
+  });
+
   fontCanvas.addEventListener('click', (e) => {
     if (!state.font) {
       return;

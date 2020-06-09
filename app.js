@@ -199,7 +199,7 @@ function setup() {
   });
 
   $('#menuExportToSVG').addEventListener('click', (e) => {
-    $('#menuExport').classList.toggle('navi__list-item--open');
+    // $('#menuExport').classList.toggle('navi__list-item--open');
     e.preventDefault();
     const anchor = document.createElement('a');
     anchor.setAttribute('download', 'test-svg.svg');
@@ -210,8 +210,26 @@ function setup() {
     anchor.click();
   });
 
+  $('#menuExportToTTF').addEventListener('click', (e) => {
+    e.preventDefault();
+    const familyName = prompt(
+      'NOTE: early prototype. Only the chars 32-127 work for now\n\ntype in a family name:',
+      'eight-bit-mono'
+    );
+    if (!familyName) {
+      return;
+    }
+    const anchor = document.createElement('a');
+    anchor.setAttribute('download', 'test-font.ttf');
+    anchor.setAttribute(
+      'href',
+      'data:application/octet-stream;base64,' +
+        btoa(svg2ttf(createGlyphSVG(state.font, familyName)))
+    );
+    anchor.click();
+  });
+
   $('#menuExportToPNG').addEventListener('click', (e) => {
-    $('#menuExport').classList.toggle('navi__list-item--open');
     e.preventDefault();
     const anchor = document.createElement('a');
     anchor.setAttribute('download', 'test-png.png');

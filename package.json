@@ -4,11 +4,16 @@
   "description": "A pixel editor",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build-ttf-export": "browserify -s svg2ttf font-export/lib/svg-to-ttf.js > font-export/lib/svg-to-ttf.browser.js"
   },
   "author": "Lea Rosema",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.17.1"
+    "express": "^4.17.1",
+    "svg2ttf": "^5.0.0"
+  },
+  "devDependencies": {
+    "browserify": "^16.5.1"
   }
 }

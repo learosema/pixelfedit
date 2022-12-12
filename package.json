@@ -10,7 +10,7 @@
   "author": "Lea Rosema",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.17.1",
+    "express": "^4.17.3",
     "svg2ttf": "^5.0.0"
   },
   "devDependencies": {

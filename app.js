@@ -237,6 +237,15 @@ function setup() {
     anchor.click();
   });
 
+  $('#menuExportToC').addEventListener('click', (e) => {
+    e.preventDefault();
+    const anchor = document.createElement('a');
+    anchor.setAttribute('download', 'fontdata.h');
+    anchor.setAttribute('href', createCHeaderFile(state.font));
+    anchor.click();
+  });
+
+
   fontCanvas.addEventListener('click', (e) => {
     if (!state.font) {
       return;

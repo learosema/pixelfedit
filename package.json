@@ -9,11 +9,7 @@
   },
   "author": "Lea Rosema",
   "license": "ISC",
-  "dependencies": {
-    "express": "^4.19.2",
-    "svg2ttf": "^6.0.3"
-  },
   "devDependencies": {
-    "browserify": "^17.0.0"
+    "express": "^5.1.0"
   }
 }

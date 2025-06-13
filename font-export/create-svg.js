@@ -3,7 +3,7 @@
  * @param {Uint8Array} font binary data of the raster font
  * @returns {string} SVG-String
  */
-function createSVG(font) {
+export function createSVG(font) {
   const numRows = (font.length / 256) | 0;
   const viewBox = [0, 0, 8 * 16, numRows * 16].join(' ');
   const symbolViewBox = [0, 0, 8, numRows];

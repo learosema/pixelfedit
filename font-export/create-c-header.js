@@ -1,4 +1,4 @@
-function createCHeaderFile(font) {
+export function createCHeaderFile(font) {
   const sz = (font.length / 256)|0;
   let code = `const uint8_t data[] = {\n`;
 

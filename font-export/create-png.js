@@ -2,7 +2,7 @@
  * Export font to PNG
  * @param {Uint8Array} the font
  */
-function createPNG(font) {
+export function createPNG(font) {
   const numRows = font.length / 256;
   const fontCanvas = document.createElement('canvas');
   fontCanvas.width = 8 * 16;

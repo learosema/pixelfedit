@@ -1,6 +1,8 @@
+import { createSVG, createPNG, createCHeaderFile } from './font-export/index.js';
+
 const $ = document.querySelector.bind(document);
 const $node = (markup = '<div></div>') => {
-  el = document.createElement('div');
+  const el = document.createElement('div');
   el.innerHTML = markup.trim();
   const node = el.firstElementChild;
   node.remove();
@@ -49,7 +51,7 @@ function loadOnlineFontList() {
     const xhr = new XMLHttpRequest();
     xhr.open(
       'GET',
-      'https://api.github.com/repos/terabaud/pixelfedit/contents/fonts'
+      'https://api.github.com/repos/learosema/pixelfedit/contents/fonts'
     );
     xhr.onload = () => {
       if (xhr.status !== 200) {

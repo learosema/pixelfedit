@@ -1,113 +1,111 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="css/index.css" />
-    <title>PixelFedit</title>
-  </head>
-  <body>
-    <svg id="symbols" viewBox="0 0 0 0">
-      <symbol id="disk" viewBox="0 0 128 128">
-        <path
-          stroke="currentColor"
-          stroke-width="6"
-          stroke-linecap="square"
-          stroke-linejoin="bevel"
-          fill="none"
-          d="M30 30 l52 0 l16 16 l0 52 l-68 0 l 0 -68 M40 30 l0 24 l36 0 l0 -24 M48 30 l0 16 l6 0 l0 -16 M40 98 l0 -30 l48 0 l0 30"
-        />
-      </symbol>
-      <symbol id="open" viewBox="0 0 128 128">
-        <path
-          stroke="currentColor"
-          stroke-width="6"
-          stroke-linecap="square"
-          stroke-linejoin="bevel"
-          fill="none"
-          d="M30,98 l15,-30 l60,0 l-15,30 l-60,0 l0,-45 l8,-8 l8,0 l8,8 l36,0 l0,15"
-        />
-      </symbol>
-      <symbol id="export" viewBox="0 0 128 128">
-        <path
-          stroke="currentColor"
-          stroke-width="6"
-          stroke-linecap="square"
-          stroke-linejoin="bevel"
-          fill="none"
-          d="M30,98 q60 0 60 -60 l-16,16 l 32,0 l -16,-16"
-        />
-      </symbol>
-    </svg>
-    <input
-      id="inputFile"
-      type="file"
-      class="hidden"
-      accept="application/octet-stream"
-    />
-    <nav class="navi">
-      <ul class="navi__list">
-        <li class="navi__list-item logo">
-          <h1>PixelFedit</h1>
-        </li>
 
-        <li class="navi__list-item" id="menuOpen">
-          <a class="navi__anchor">
-            <svg class="icon">
-              <title>Open</title>
-              <use xlink:href="#open" />
-            </svg>
-            <span>open</span>
-          </a>
-          <ul class="navi__sub" id="subMenuOpen">
-            <li class="navi__sub-item">
-              <a class="navi__sub-link" id="menuOpenLocal">local file</a>
-            </li>
-          </ul>
-        </li>
-        <li class="navi__list-item" id="menuSave">
-          <a class="navi__anchor">
-            <svg class="icon">
-              <title>Save</title>
-              <use xlink:href="#disk" />
-            </svg>
-            <span>save</span>
-          </a>
-        </li>
-        <li class="navi__list-item" id="menuExport">
-          <a class="navi__anchor">
-            <svg class="icon">
-              <title>export</title>
-              <use xlink:href="#export" />
-            </svg>
-            <span>export</span>
-          </a>
-          <ul class="navi__sub">
-            <li class="navi__sub-item">
-              <a class="navi__sub-link" id="menuExportToPNG">to PNG</a>
-            </li>
-            <li class="navi__sub-item">
-              <a class="navi__sub-link" id="menuExportToSVG">to SVG</a>
-            </li>
-            <li class="navi__sub-item">
-              <a class="navi__sub-link" id="menuExportToTTF">to TTF</a>
-            </li>
-            <li class="navi__sub-item">
-              <a class="navi__sub-link" id="menuExportToC">to C</a>
-            </li>
-          </ul>
-        </li>
-      </ul>
-    </nav>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="css/index.css" />
+  <title>PixelFedit</title>
+</head>
 
-    <main class="main">
-      <div class="char-wrapper">
-        <canvas class="char-canvas" tabindex="0"></canvas>
+<body>
+  <svg id="symbols" viewBox="0 0 0 0">
+    <symbol id="close" viewBox="0 0 72 72">
+      <line x1="17.5" x2="54.5" y1="17.5" y2="54.5" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" stroke-width="2"/>
+      <line x1="54.5" x2="17.5" y1="17.5" y2="54.5" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" stroke-width="2"/>
+    </symbol>
+    <symbol id="disk" viewBox="0 0 128 128">
+      <path stroke="currentColor" stroke-width="6" stroke-linecap="square" stroke-linejoin="bevel" fill="none"
+        d="M30 30 l52 0 l16 16 l0 52 l-68 0 l 0 -68 M40 30 l0 24 l36 0 l0 -24 M48 30 l0 16 l6 0 l0 -16 M40 98 l0 -30 l48 0 l0 30" />
+    </symbol>
+    <symbol id="open" viewBox="0 0 128 128">
+      <path stroke="currentColor" stroke-width="6" stroke-linecap="square" stroke-linejoin="bevel" fill="none"
+        d="M30,98 l15,-30 l60,0 l-15,30 l-60,0 l0,-45 l8,-8 l8,0 l8,8 l36,0 l0,15" />
+    </symbol>
+    <symbol id="export" viewBox="0 0 128 128">
+      <path stroke="currentColor" stroke-width="6" stroke-linecap="square" stroke-linejoin="bevel" fill="none"
+        d="M30,98 q60 0 60 -60 l-16,16 l 32,0 l -16,-16" />
+    </symbol>
+  </svg>
+  <input id="inputFile" type="file" class="hidden" accept="application/octet-stream" />
+  <nav class="nav">
+    <ul>
+      <li class="li--logo">
+        <h1>PixelFedit</h1>
+      </li>
+      <li>
+        <button class="text-icon-button" id="menuOpen">
+          <svg class="icon">
+            <title>Open</title>
+            <use xlink:href="#open" />
+          </svg>
+          <span>open</span>
+        </button>
+      </li>
+      <li>
+        <button class="text-icon-button" id="menuSave">
+          <svg class="icon">
+            <title>Save</title>
+            <use xlink:href="#disk" />
+          </svg>
+          <span>save</span>
+        </button>
+      </li>
+    </ul>
+  </nav>
+
+  <main class="main">
+    <div class="char-wrapper">
+      <canvas class="char-canvas" tabindex="0"></canvas>
+    </div>
+    <div class="font-wrapper">
+      <canvas class="font-canvas" tabindex="0"></canvas>
+    </div>
+  </main>
+  <dialog class="dialog" id="openDialog">
+    <h2>Open File</h2>
+    <form id="openForm">
+      <div class="field">
+        <label for="selectOpen">Select File</label>
+        <select id="selectOpen">
+          <option value="local">local file</option>
+        </select>
       </div>
-      <div class="font-wrapper">
-        <canvas class="font-canvas" tabindex="0"></canvas>
+      <button> open </button>
+    </form>
+    <form method="dialog">
+      <button class="close">
+        <svg aria-hidden="true" class="icon">
+          <use xlink:href="#close" />
+        </svg>
+        <span class="visually-hidden">close</span>
+      </button>
+    </form>
+  </dialog>
+  <dialog class="dialog" id="saveDialog">
+    <h2>Save File locally</h2>
+    <form id="saveForm">
+      <div class="field">
+        <label for="selectSaveFormat">Select File Type</label>
+        <select id="selectSaveFormat">
+          <option value="binary">binary</option>
+          <option value="png">png</option>
+          <option value="svg">svg</option>
+        </select>
       </div>
-    </main>
-    <script type="module" src="/js/app.js"></script>
-  </body>
+      <button> download </button>
+    </form>
+    <form method="dialog">
+      <button class="close">
+        <svg aria-hidden="true" class="icon">
+          <use xlink:href="#close" />
+        </svg>
+        <span class="visually-hidden">close</span>
+      </button>
+    </form>
+  </dialog>
+  <div aria-live="polite" id="liveRegion" class="visually-hidden"></div>
+  <script type="module" src="/js/app.js"></script>
+</body>
+
 </html>

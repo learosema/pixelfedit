@@ -26,6 +26,51 @@ const state = {
   onlineFonts: [],
 };
 
+function screenreaderAnnounce(message) {
+  $('#liveRegion').innerHTML = `<p>${message}</p>`
+  console.info('SR: ', message)
+}
+
+function saveBinary(font, filename = 'awesome-font.bin') {
+  const anchor = document.createElement('a');
+  anchor.setAttribute('download', filename);
+  anchor.setAttribute(
+    'href',
+    'data:application/octet-stream;base64,' +
+    btoa(String.fromCharCode.apply(null, font))
+  );
+  anchor.click();
+}
+
+function savePNG(font, filename = 'awesome-font.png') {
+  const anchor = document.createElement('a');
+  anchor.setAttribute('download', filename);
+  anchor.setAttribute('href', createPNG(font));
+  anchor.click();
+}
+
+function saveSVG(font, filename = 'awesome-font.svg') {
+  const anchor = document.createElement('a');
+  anchor.setAttribute('download', filename);
+  anchor.setAttribute(
+    'href',
+    'data:application/octet-stream;base64,' + btoa(createSVG(font))
+  );
+  anchor.click();
+}
+
+function saveCode(font, filename = 'fontdata.h') {
+  const anchor = document.createElement('a');
+  anchor.setAttribute('download', filename);
+  anchor.setAttribute('href', createCHeaderFile(state.font));
+  anchor.click();
+}
+
+function loadLocal() {
+  const inputFile = $('#inputFile');
+  inputFile.click();
+}
+
 function saveToLocalStorage(state) {
   const data = Array.from(state.font, (v) => v.toString(16).padStart(2, '0')).join('')
   localStorage.setItem('font', `${state.numCols}x${state.numRows} ${data}`)
@@ -166,9 +211,11 @@ function renderCharacter(state) {
 }
 
 function togglePixel(state) {
+  const bit = 1 << (7 - state.x);
   const line = state.currentChar * state.numRows + state.y;
-  state.font[line] ^= 1 << (7 - state.x);
+  state.font[line] ^= bit;
   renderCharacter(state)
+  screenreaderAnnounce(`${state.x} ${state.y} ${(state.font[line] & bit) ? 'set':'unset'}`)
 }
 
 function setCanvasSizes(state) {
@@ -178,24 +225,25 @@ function setCanvasSizes(state) {
   charCanvas.height = 1 + state.numRows * (state.zoomPixelSize + 1);
 }
 
+const onLoadFont = (font) => {
+  state.numRows = (font.length / 256) | 0;
+  state.font = font;
+  setCanvasSizes(state);
+  renderFontCanvas(state);
+  renderCharacter(state);
+};
+
 function setup() {
-  const onLoadFont = (font) => {
-    state.numRows = (font.length / 256) | 0;
-    state.font = font;
-    setCanvasSizes(state);
-    renderFontCanvas(state);
-    renderCharacter(state);
-  };
 
   loadOnlineFontList().then((data) => {
-    const subMenuOpen = $('#subMenuOpen');
+    const selectOpen = $('#selectOpen');
     data.map((item) => {
       const $li = $node(`
-          <li class="navi__sub-item">
-            <a class="navi__sub-link" data-path="${item.path}">${item.name} (8x${item.rows})</a>
-          </li>
+          <option value="${item.path}">
+            ${item.name}
+          </option>
         `);
-      subMenuOpen.appendChild($li);
+      selectOpen.appendChild($li);
     });
   });
 
@@ -206,17 +254,43 @@ function setup() {
     onLoadFont(restoredFont);
   }
 
-  $('#menuOpen').addEventListener('click', (e) => {
-    $('#menuOpen').classList.toggle('navi__list-item--open');
-    if (e.target.hasAttribute('data-path')) {
-      loadFont(e.target.getAttribute('data-path')).then(onLoadFont);
-    }
-    return;
+  $('#menuOpen').addEventListener('click', () => {
+    $('#openDialog').showModal();
   });
 
-  $('#menuOpenLocal').addEventListener('click', () => {
-    const inputFile = $('#inputFile');
-    inputFile.click();
+  $('#menuSave').addEventListener('click', () => {
+    $('#saveDialog').showModal();
+  });
+
+  $('#saveForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const selectSaveFormat = $('#selectSaveFormat').value
+    switch (selectSaveFormat) {
+      case 'binary':
+        saveBinary(state.font);
+        break;
+      case 'png':
+        savePNG(state.font);
+        break;
+      case 'svg':
+        saveSVG(state.font);
+        break;
+      case 'c':
+        saveCode(state.font);
+    }
+    $('#saveDialog').close();
+  });
+
+  $('#openForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const selectOpen = $('#selectOpen').value
+    if (selectOpen === 'local') {
+      loadLocal();
+    } else {
+      console.log('muh', selectOpen)
+      loadFont(selectOpen).then(onLoadFont);
+    }
+    $('#openDialog').close();
   });
 
   $('#inputFile').addEventListener('change', () => {
@@ -232,56 +306,6 @@ function setup() {
     };
     reader.readAsArrayBuffer(file);
   });
-
-  $('#menuSave').addEventListener('click', () => {
-    const anchor = document.createElement('a');
-    anchor.setAttribute('download', 'awesome-font.bin');
-    anchor.setAttribute(
-      'href',
-      'data:application/octet-stream;base64,' +
-      btoa(String.fromCharCode.apply(null, state.font))
-    );
-    anchor.click();
-  });
-
-  $('#menuExport').addEventListener('click', () => {
-    $('#menuExport').classList.toggle('navi__list-item--open');
-    return;
-  });
-
-  $('#menuExportToSVG').addEventListener('click', (e) => {
-    // $('#menuExport').classList.toggle('navi__list-item--open');
-    e.preventDefault();
-    const anchor = document.createElement('a');
-    anchor.setAttribute('download', 'test-svg.svg');
-    anchor.setAttribute(
-      'href',
-      'data:application/octet-stream;base64,' + btoa(createSVG(state.font))
-    );
-    anchor.click();
-  });
-
-  $('#menuExportToTTF').addEventListener('click', (e) => {
-    e.preventDefault();
-    alert('Temporarily disabled. Needs more work.');
-  });
-
-  $('#menuExportToPNG').addEventListener('click', (e) => {
-    e.preventDefault();
-    const anchor = document.createElement('a');
-    anchor.setAttribute('download', 'test-png.png');
-    anchor.setAttribute('href', createPNG(state.font));
-    anchor.click();
-  });
-
-  $('#menuExportToC').addEventListener('click', (e) => {
-    e.preventDefault();
-    const anchor = document.createElement('a');
-    anchor.setAttribute('download', 'fontdata.h');
-    anchor.setAttribute('href', createCHeaderFile(state.font));
-    anchor.click();
-  });
-
 
   fontCanvas.addEventListener('click', (e) => {
     if (!state.font) {
@@ -314,10 +338,11 @@ function setup() {
   fontCanvas.addEventListener('keydown', (e) => {
     if (e.code === 'ArrowUp') {
       e.preventDefault();
-      state.currentChar-=16;
+      state.currentChar -= 16;
       if (state.currentChar < 0) {
         state.currentChar += 256
       }
+      screenreaderAnnounce(`character ${state.currentChar}`)
       renderCharacter(state)
       renderFontCanvas(state)
     }
@@ -327,6 +352,7 @@ function setup() {
       if (state.currentChar > 255) {
         state.currentChar -= 256
       }
+      screenreaderAnnounce(`character ${state.currentChar}`)
       renderCharacter(state)
       renderFontCanvas(state)
     }
@@ -336,6 +362,7 @@ function setup() {
       if (state.currentChar < 0) {
         state.currentChar += 256
       }
+      screenreaderAnnounce(`character ${state.currentChar}`)
       renderCharacter(state)
       renderFontCanvas(state)
     }
@@ -345,6 +372,7 @@ function setup() {
       if (state.currentChar > 255) {
         state.currentChar -= 256
       }
+      screenreaderAnnounce(`character ${state.currentChar}`)
       renderCharacter(state)
       renderFontCanvas(state)
     }

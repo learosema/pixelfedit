@@ -40,7 +40,7 @@ export function createSVG(font) {
  * @param {Uint8Array} font binary font data
  * @returns {string} SVG-String
  */
-function createGlyphSVG(font, fontName = 'eight-bit-mono') {
+export function createGlyphSVG(font, fontName = 'eight-bit-mono') {
   const numRows = (font.length / 256) | 0;
   const viewBox = [0, 0, 8 * 16, numRows * 16].join(' ');
   const glyphs = [];

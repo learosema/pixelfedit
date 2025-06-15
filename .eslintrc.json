@@ -1,0 +1,41 @@
+{
+  "root": true,
+  "env": {
+    "browser": true,
+    "es2021": true
+  },
+  "extends": "eslint:recommended",
+  "parserOptions": {
+    "ecmaVersion": 12,
+    "sourceType": "module"
+  },
+  "rules": {
+    // prohibit confusing code
+    "no-eval": "error",
+    "no-implied-eval": "error",
+    "no-new-func": "error",
+
+    // prohibit poor practices
+    "no-iterator": "error",
+    "no-redeclare": "error",
+    "no-shadow": "error",
+
+    // enforce code quality
+    "eqeqeq": ["error", "always"],
+    "curly": "error",
+    "no-empty-function": "error",
+    "no-empty-blocks": "error",
+
+    // prohibit usage of variables before they are defined
+    "no-use-before-define": "error",
+
+    // prohibit unused variables
+    "no-unused-vars": [
+      "error",
+      { "vars": "all", "args": "after-used" }
+    ],
+
+    // prohibit console.log in production code
+    "no-console": "error"
+  }
+}

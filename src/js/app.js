@@ -26,6 +26,24 @@ const state = {
   onlineFonts: [],
 };
 
+function saveToLocalStorage(state) {
+  const data = Array.from(state.font, (v) => v.toString(16).padStart(2, '0')).join('')
+  localStorage.setItem('font', `${state.numCols}x${state.numRows} ${data}`)
+}
+
+function restoreFromLocalStorage() {
+  const storage = localStorage.getItem('font');
+  if (!storage || /^8x\d{1,2} [0-9a-fA-F]{2,16384}$/.test(storage) === false) {
+    return null;
+  }
+  const [, data] = storage.split(' ')
+  const font = new Uint8Array(data.length / 2)
+  for (let i = 0; i < font.length; i++) {
+    font[i] = Number.parseInt(data.slice(i * 2, i * 2 + 2), 16)
+  }
+  return font
+}
+
 function loadFont(fileName) {
   return new Promise((resolve, reject) => {
     const xhr = new XMLHttpRequest();
@@ -111,7 +129,23 @@ function renderFontCanvas(state, specificChar) {
   }
 }
 
+function renderCharCursor(state) {
+  const pixelSize = state.zoomPixelSize;
+  const ctx = charCtx
+  ctx.strokeStyle = '#f7c'
+  ctx.beginPath()
+  ctx.strokeRect(
+    state.x * (pixelSize + 1),
+    state.y * (pixelSize + 1),
+    pixelSize + 2,
+    pixelSize + 2
+  );
+  ctx.stroke()
+}
+
 function renderCharacter(state) {
+  charCtx.clearRect(0, 0, charCanvas.width, charCanvas.height)
+
   const pixelSize = state.zoomPixelSize;
   const n = state.currentChar;
   for (let j = 0; j < state.numRows; j++) {
@@ -126,6 +160,15 @@ function renderCharacter(state) {
       );
     }
   }
+  if (document.activeElement === charCanvas) {
+    renderCharCursor(state)
+  }
+}
+
+function togglePixel(state) {
+  const line = state.currentChar * state.numRows + state.y;
+  state.font[line] ^= 1 << (7 - state.x);
+  renderCharacter(state)
 }
 
 function setCanvasSizes(state) {
@@ -155,7 +198,13 @@ function setup() {
       subMenuOpen.appendChild($li);
     });
   });
-  loadFont('fonts/8X16.BIN').then(onLoadFont);
+
+  const restoredFont = restoreFromLocalStorage()
+  if (!restoredFont) {
+    loadFont('fonts/8X16.BIN').then(onLoadFont);
+  } else {
+    onLoadFont(restoredFont);
+  }
 
   $('#menuOpen').addEventListener('click', (e) => {
     $('#menuOpen').classList.toggle('navi__list-item--open');
@@ -165,12 +214,12 @@ function setup() {
     return;
   });
 
-  $('#menuOpenLocal').addEventListener('click', (e) => {
+  $('#menuOpenLocal').addEventListener('click', () => {
     const inputFile = $('#inputFile');
     inputFile.click();
   });
 
-  $('#inputFile').addEventListener('change', (e) => {
+  $('#inputFile').addEventListener('change', () => {
     const file = $('#inputFile').files[0];
     // TODO: if file.name ends with .png then try to import?
     if (!file || file instanceof Blob === false) {
@@ -184,18 +233,18 @@ function setup() {
     reader.readAsArrayBuffer(file);
   });
 
-  $('#menuSave').addEventListener('click', (e) => {
+  $('#menuSave').addEventListener('click', () => {
     const anchor = document.createElement('a');
     anchor.setAttribute('download', 'awesome-font.bin');
     anchor.setAttribute(
       'href',
       'data:application/octet-stream;base64,' +
-        btoa(String.fromCharCode.apply(null, state.font))
+      btoa(String.fromCharCode.apply(null, state.font))
     );
     anchor.click();
   });
 
-  $('#menuExport').addEventListener('click', (e) => {
+  $('#menuExport').addEventListener('click', () => {
     $('#menuExport').classList.toggle('navi__list-item--open');
     return;
   });
@@ -214,21 +263,7 @@ function setup() {
 
   $('#menuExportToTTF').addEventListener('click', (e) => {
     e.preventDefault();
-    const familyName = prompt(
-      'NOTE: early prototype. Only the chars 32-127 work for now\n\ntype in a family name:',
-      'eight-bit-mono'
-    );
-    if (!familyName) {
-      return;
-    }
-    const anchor = document.createElement('a');
-    anchor.setAttribute('download', 'test-font.ttf');
-    anchor.setAttribute(
-      'href',
-      'data:application/octet-stream;base64,' +
-        btoa(svg2ttf(createGlyphSVG(state.font, familyName)))
-    );
-    anchor.click();
+    alert('Temporarily disabled. Needs more work.');
   });
 
   $('#menuExportToPNG').addEventListener('click', (e) => {
@@ -266,14 +301,100 @@ function setup() {
     const pixelSize = state.zoomPixelSize;
     const x = e.clientX - charCanvas.offsetLeft + window.scrollX;
     const y = e.clientY - charCanvas.offsetTop + window.scrollY;
-    const xIndex = ((x - 1) / (pixelSize + 1)) | 0;
-    const yIndex = ((y - 1) / (pixelSize + 1)) | 0;
-    console.log(xIndex, yIndex);
-    const line = state.currentChar * state.numRows + yIndex;
-    state.font[line] ^= 1 << (7 - xIndex);
-    renderCharacter(state);
+    state.x = ((x - 1) / (pixelSize + 1)) | 0;
+    state.y = ((y - 1) / (pixelSize + 1)) | 0;
+    togglePixel(state);
     renderFontCanvas(state, state.currentChar);
+    saveToLocalStorage(state);
   });
+
+  charCanvas.addEventListener('focusin', () => renderCharacter(state))
+  charCanvas.addEventListener('focusout', () => renderCharacter(state))
+
+  fontCanvas.addEventListener('keydown', (e) => {
+    if (e.code === 'ArrowUp') {
+      e.preventDefault();
+      state.currentChar-=16;
+      if (state.currentChar < 0) {
+        state.currentChar += 256
+      }
+      renderCharacter(state)
+      renderFontCanvas(state)
+    }
+    if (e.code === 'ArrowDown') {
+      e.preventDefault();
+      state.currentChar += 16;
+      if (state.currentChar > 255) {
+        state.currentChar -= 256
+      }
+      renderCharacter(state)
+      renderFontCanvas(state)
+    }
+    if (e.code === 'ArrowLeft') {
+      e.preventDefault();
+      state.currentChar--;
+      if (state.currentChar < 0) {
+        state.currentChar += 256
+      }
+      renderCharacter(state)
+      renderFontCanvas(state)
+    }
+    if (e.code === 'ArrowRight') {
+      e.preventDefault();
+      state.currentChar++;
+      if (state.currentChar > 255) {
+        state.currentChar -= 256
+      }
+      renderCharacter(state)
+      renderFontCanvas(state)
+    }
+  })
+
+  charCanvas.addEventListener('keydown', (e) => {
+    if (e.code === 'ArrowUp') {
+      e.preventDefault();
+      if (state.y > 0) {
+        state.y -= 1;
+      } else {
+        state.y = state.numRows - 1;
+      }
+      renderCharacter(state)
+      return
+    }
+    if (e.code === 'ArrowDown') {
+      e.preventDefault()
+      if (state.y < state.numRows - 1) {
+        state.y += 1;
+      } else {
+        state.y = 0;
+      }
+      renderCharacter(state)
+    }
+
+    if (e.code === 'ArrowLeft') {
+      e.preventDefault()
+      if (state.x > 0) {
+        state.x -= 1
+      } else {
+        state.x = state.numCols - 1
+      }
+      renderCharacter(state)
+      return
+    }
+    if (e.code === 'ArrowRight') {
+      e.preventDefault()
+      if (state.x < state.numCols - 1) {
+        state.x += 1
+      } else {
+        state.x = 0
+      }
+      renderCharacter(state)
+    }
+    if (e.code === 'Space') {
+      togglePixel(state);
+      e.preventDefault();
+    }
+  })
 }
 
 setup();

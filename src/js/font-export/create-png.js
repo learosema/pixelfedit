@@ -12,9 +12,6 @@ export function createPNG(font) {
   for (let y = 0; y < 16; y++) {
     for (let x = 0; x < 16; x++) {
       const n = y * 16 + x;
-      if (typeof specificChar !== 'undefined' && specificChar !== n) {
-        continue;
-      }
       for (let j = 0; j < numRows; j++) {
         const line = font[n * numRows + j];
         for (let i = 0; i < 8; i++) {

@@ -37,6 +37,7 @@ jobs:
           node-version: 20
       - name: Build
         run: |
+          npm ci
           npm run build
           touch dist/.nojekyll
       - name: Setup Pages

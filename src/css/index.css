@@ -1,12 +1,22 @@
 @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
 
+*, *::before, *::after {
+  margin: 0;
+}
+
+*:focus {
+  outline: 0.125em solid var(--focus-outline, currentColor);
+}
+
 body {
   background: #222;
   color: #fff;
   font-family: sans-serif;
   line-height: 1.8;
   margin: 0 auto;
-  max-width: 800px;
+  min-height: 100dvh;
+  flex-direction: column;
+  display: flex;
 }
 
 a {
@@ -17,6 +27,7 @@ a {
 h1,
 h2,
 h3 {
+  margin: 0;
   font-family: 'Press Start 2P', monospace;
 }
 
@@ -46,23 +57,15 @@ a:hover {
 }
 
 .navi {
-  position: sticky;
-  top: 0;
   padding: 4px 0;
   background: #000;
-  flex-grow: 1;
-}
-
-@media (min-width: 800px) {
-  .navi {
-    border-radius: 16px;
-  }
 }
 
 .navi__list {
   list-style: none;
   display: flex;
-  justify-content: flex-end;
+  flex-wrap: wrap;
+  align-items: center;
   padding: 0;
   margin: 0;
 }
@@ -70,6 +73,11 @@ a:hover {
 .navi__list-item {
   position: relative;
 }
+
+.navi__list-item.logo {
+  margin: 0 auto 0 1em;
+}
+
 
 .navi__anchor {
   display: flex;
@@ -141,18 +149,12 @@ a:hover {
 
 .main {
   display: flex;
+  flex: 1 auto;
   justify-content: space-around;
-  margin: 1em 0;
   flex-wrap: wrap;
-  margin: 1em auto;
-  padding: 1em 1.5em;
-  box-sizing: border-box;
-  border-radius: 1em;
-  background-image: linear-gradient(#000, #000),
-    linear-gradient(45deg, #f39, #f93, #129);
-  background-origin: border-box;
-  background-clip: padding-box, border-box;
-  border: 0.5em solid transparent;
+  padding: 1rem;
+  gap: 1rem;
+
 }
 
 .char-canvas {

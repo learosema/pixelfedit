@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="index.css" />
+    <link rel="stylesheet" href="css/index.css" />
     <title>PixelFedit</title>
   </head>
   <body>
@@ -39,9 +39,6 @@
         />
       </symbol>
     </svg>
-    <header class="header">
-      <h1 class="header__headline">PixelFedit</h1>
-    </header>
     <input
       id="inputFile"
       type="file"
@@ -50,6 +47,10 @@
     />
     <nav class="navi">
       <ul class="navi__list">
+        <li class="navi__list-item logo">
+          <h1>PixelFedit</h1>
+        </li>
+
         <li class="navi__list-item" id="menuOpen">
           <a class="navi__anchor">
             <svg class="icon">
@@ -101,13 +102,12 @@
 
     <main class="main">
       <div class="char-wrapper">
-        <canvas class="char-canvas"></canvas>
+        <canvas class="char-canvas" tabindex="0"></canvas>
       </div>
       <div class="font-wrapper">
-        <canvas class="font-canvas"></canvas>
+        <canvas class="font-canvas" tabindex="0"></canvas>
       </div>
     </main>
-    <script src="font-export/lib/svg-to-ttf.browser.js"></script>
-    <script type="module" src="app.js"></script>
+    <script type="module" src="/js/app.js"></script>
   </body>
 </html>

@@ -2,14 +2,19 @@
   "name": "pixelfedit",
   "version": "1.0.0",
   "description": "A pixel editor",
-  "main": "server.js",
+  "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build-ttf-export": "browserify -s svg2ttf font-export/lib/svg-to-ttf.js > font-export/lib/svg-to-ttf.browser.js"
+    "dev": "eleventy --serve",
+    "test": "eslint src",
+    "build": "eleventy"
   },
   "author": "Lea Rosema",
   "license": "ISC",
   "devDependencies": {
-    "express": "^5.1.0"
+    "@11ty/eleventy": "^3.1.1",
+    "@eslint/eslintrc": "^3.3.1",
+    "@eslint/js": "^9.29.0",
+    "eslint": "^9.29.0",
+    "globals": "^16.2.0"
   }
 }

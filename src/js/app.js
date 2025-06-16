@@ -114,7 +114,7 @@ function loadOnlineFontList() {
     const xhr = new XMLHttpRequest();
     xhr.open(
       'GET',
-      'https://api.github.com/repos/learosema/pixelfedit/contents/fonts'
+      'https://api.github.com/repos/learosema/pixelfedit/contents/src/fonts'
     );
     xhr.onload = () => {
       if (xhr.status !== 200) {
@@ -124,7 +124,7 @@ function loadOnlineFontList() {
       try {
         const data = JSON.parse(xhr.response).map((item) => ({
           name: item.name,
-          path: item.path,
+          path: 'fonts/' + item.name,
           cols: 8,
           rows: item.size / 256,
         }));

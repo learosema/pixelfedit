@@ -56,10 +56,12 @@
 
   <main class="main">
     <div class="char-wrapper">
-      <canvas class="char-canvas" tabindex="0"></canvas>
+      <canvas class="char-canvas" tabindex="0" aria-label="Character Detail Pixel Editor" aria-describedby="pixelEditorHelp"></canvas>
+      <p id="pixelEditorHelp" class="visually-hidden" aria-hidden="true">use cursor keys to navigate, use space to toggle pixels, pixels are announced</p>
     </div>
     <div class="font-wrapper">
-      <canvas class="font-canvas" tabindex="0"></canvas>
+      <canvas class="font-canvas" tabindex="0" aria-label="Character Grid" aria-describedby="characterGridHelp"></canvas>
+      <p id="characterGridHelp" class="visually-hidden" aria-hidden="true">use cursor keys to select a character</p>
     </div>
   </main>
   <dialog class="dialog" id="openDialog">

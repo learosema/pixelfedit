@@ -31,6 +31,12 @@ function screenreaderAnnounce(message) {
   console.info('SR: ', message)
 }
 
+function screenreaderAnnouncePixel() {
+  const bit = 1 << (7 - state.x);
+  const line = state.currentChar * state.numRows + state.y;
+  screenreaderAnnounce(`${state.x} ${state.y} ${(state.font[line] & bit) ? 'set':'unset'}`)
+}
+
 function saveBinary(font, filename = 'awesome-font.bin') {
   const anchor = document.createElement('a');
   anchor.setAttribute('download', filename);
@@ -177,7 +183,8 @@ function renderFontCanvas(state, specificChar) {
 function renderCharCursor(state) {
   const pixelSize = state.zoomPixelSize;
   const ctx = charCtx
-  ctx.strokeStyle = '#f7c'
+  ctx.strokeStyle = 'deeppink'
+  ctx.lineWidth = 3
   ctx.beginPath()
   ctx.strokeRect(
     state.x * (pixelSize + 1),
@@ -215,7 +222,7 @@ function togglePixel(state) {
   const line = state.currentChar * state.numRows + state.y;
   state.font[line] ^= bit;
   renderCharacter(state)
-  screenreaderAnnounce(`${state.x} ${state.y} ${(state.font[line] & bit) ? 'set':'unset'}`)
+  screenreaderAnnouncePixel()
 }
 
 function setCanvasSizes(state) {
@@ -328,6 +335,7 @@ function setup() {
     state.x = ((x - 1) / (pixelSize + 1)) | 0;
     state.y = ((y - 1) / (pixelSize + 1)) | 0;
     togglePixel(state);
+    renderCharacter(state);
     renderFontCanvas(state, state.currentChar);
     saveToLocalStorage(state);
   });
@@ -387,6 +395,7 @@ function setup() {
         state.y = state.numRows - 1;
       }
       renderCharacter(state)
+      screenreaderAnnouncePixel()
       return
     }
     if (e.code === 'ArrowDown') {
@@ -397,6 +406,7 @@ function setup() {
         state.y = 0;
       }
       renderCharacter(state)
+      screenreaderAnnouncePixel()
     }
 
     if (e.code === 'ArrowLeft') {
@@ -407,7 +417,7 @@ function setup() {
         state.x = state.numCols - 1
       }
       renderCharacter(state)
-      return
+      screenreaderAnnouncePixel()
     }
     if (e.code === 'ArrowRight') {
       e.preventDefault()
@@ -417,9 +427,11 @@ function setup() {
         state.x = 0
       }
       renderCharacter(state)
+      screenreaderAnnouncePixel()
     }
     if (e.code === 'Space') {
       togglePixel(state);
+      renderFontCanvas();
       e.preventDefault();
     }
   })

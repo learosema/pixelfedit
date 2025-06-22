@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "eleventy --serve",
-    "test": "eslint src",
+    "lint": "eslint src",
+    "test": "node --test",
     "build": "eleventy"
   },
   "author": "Lea Rosema",
@@ -14,7 +15,9 @@
     "@11ty/eleventy": "^3.1.1",
     "@eslint/eslintrc": "^3.3.1",
     "@eslint/js": "^9.29.0",
+    "canvas": "^3.1.1",
     "eslint": "^9.29.0",
-    "globals": "^16.2.0"
+    "globals": "^16.2.0",
+    "jsdom": "^26.1.0"
   }
 }

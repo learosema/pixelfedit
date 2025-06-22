@@ -306,12 +306,21 @@ function setup() {
     if (!file || file instanceof Blob === false) {
       return;
     }
-    const reader = new FileReader();
-    reader.onload = () => {
-      console.log(reader.result);
-      onLoadFont(new Uint8Array(reader.result));
-    };
-    reader.readAsArrayBuffer(file);
+    if (file.name.endsWith('.png')) {
+      const reader = new FileReader()
+
+      // TOTHEFDO
+      return;
+    }
+    if (file.name.endsWith('.bin')) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        console.log(reader.result);
+        onLoadFont(new Uint8Array(reader.result));
+      };
+      reader.readAsArrayBuffer(file);
+    }
+
   });
 
   fontCanvas.addEventListener('click', (e) => {

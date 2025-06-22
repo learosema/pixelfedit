@@ -1,3 +1,5 @@
+import { EventEmitter } from 'node:events'
+
 /**
  * Provides some minimal APIs for the mess we do with canvas :)
  */
@@ -36,7 +38,22 @@ export class Image {
   onload = null
   src = null
   crossOrigin = ''
+
+  #eventEmitter = new EventEmitter()
+
+  constructor() {
+    this.#eventEmitter.on('loadimage', () => {
+      if (typeof this.onload === 'function') {
+        this.onload.apply(this, [this])
+      }
+    })
+  }
+
+  createLoadEvent() {
+
+  }
 }
 
+export class Canvas2DRenderingContext {
 
-
+}

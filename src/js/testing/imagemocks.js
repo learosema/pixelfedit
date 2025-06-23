@@ -19,7 +19,7 @@ export class ImageData {
 }
 
 /**
- *
+ * A small helper function like it is also present in the 'canvas' module
  * @param {Uint8ClampedArray} data
  * @param {number} width
  * @param {number} height
@@ -37,29 +37,74 @@ export class Image {
   src = null;
   crossOrigin = '';
 
-  #eventEmitter = new EventEmitter();
+  static #eventEmitter = new EventEmitter();
+  shouldResolve = false
 
-  constructor() {
-    this.#eventEmitter.on('loadimage', () => {
+
+  constructor(emit = null) {
+    Image.#eventEmitter.on('load', () => {
       if (typeof this.onload === 'function') {
         this.onload.apply(this, [this]);
       }
     });
 
-    this.#eventEmitter.on('error', (...args) => {
+    Image.#eventEmitter.on('error', (...args) => {
       if (typeof this.onerror === 'function') {
         this.onerror.apply(this, args);
       }
     });
   }
 
-  createLoadEvent() {
-    this.#eventEmitter.emit('loadimage');
+  static simulateLoad() {
+    setTimeout(() =>
+      Image.#eventEmitter.emit('load')
+    , 0);
   }
 
-  createErrorEvent(error) {
-    this.#eventEmitter.emit('error', error);
+  static simulateError(msg = 'Error') {
+    setTimeout(() =>
+      Image.#eventEmitter.emit('error', new Error(msg))
+    , 0);
   }
 }
 
-export class Canvas2DRenderingContext {}
+export class Canvas2DRenderingContext {
+
+  lineWidth = 1
+  strokeStyle = '#ffffff'
+  imageSmoothingEnabled = false
+
+  #imageData = null
+
+  constructor(width, height) {
+    if (Number.isFinite(width * height)) {
+      this.#imageData = new Uint8ClampedArray(width * height * 4);
+    }
+  }
+
+  withImageData(imageData) {
+    this.#imageData = imageData
+    return this
+  }
+
+  clearRect() {}
+  strokeRect() {}
+  stroke() {}
+  fillRect() {}
+  drawImage() {}
+
+  getImageData() {
+    return this.#imageData
+  }
+}
+
+export class Canvas {
+  width = 400
+  height = 300
+
+  #context = new Canvas2DRenderingContext(this.width, this.height)
+
+  getContext() {
+    return this.#context
+  }
+}

@@ -1,9 +1,8 @@
-import { EventEmitter } from 'node:events'
+import { EventEmitter } from 'node:events';
 
 /**
  * Provides some minimal APIs for the mess we do with canvas :)
  */
-
 
 export class ImageData {
   /**
@@ -13,11 +12,10 @@ export class ImageData {
    * @param {number} height
    */
   constructor(data, width, height) {
-    this.data = data
-    this.width = width
-    this.height = height
+    this.data = data;
+    this.width = width;
+    this.height = height;
   }
-
 }
 
 /**
@@ -28,32 +26,40 @@ export class ImageData {
  * @returns
  */
 export function createImageData(data, width, height) {
-  return new ImageData(data, width, height)
+  return new ImageData(data, width, height);
 }
 
 /**
  * Minimal mock for Image :D
  */
 export class Image {
-  onload = null
-  src = null
-  crossOrigin = ''
+  onload = null;
+  src = null;
+  crossOrigin = '';
 
-  #eventEmitter = new EventEmitter()
+  #eventEmitter = new EventEmitter();
 
   constructor() {
     this.#eventEmitter.on('loadimage', () => {
       if (typeof this.onload === 'function') {
-        this.onload.apply(this, [this])
+        this.onload.apply(this, [this]);
       }
-    })
+    });
+
+    this.#eventEmitter.on('error', (...args) => {
+      if (typeof this.onerror === 'function') {
+        this.onerror.apply(this, args);
+      }
+    });
   }
 
   createLoadEvent() {
+    this.#eventEmitter.emit('loadimage');
+  }
 
+  createErrorEvent(error) {
+    this.#eventEmitter.emit('error', error);
   }
 }
 
-export class Canvas2DRenderingContext {
-
-}
+export class Canvas2DRenderingContext {}

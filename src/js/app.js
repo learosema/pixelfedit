@@ -78,7 +78,7 @@ function loadLocal() {
   inputFile.click();
 }
 
-function saveToLocalStorage(state) {
+function saveToLocalStorage() {
   const data = Array.from(state.font, (v) => v.toString(16).padStart(2, '0')).join('')
   localStorage.setItem('font', `${state.numCols}x${state.numRows} ${data}`)
 }
@@ -96,22 +96,37 @@ function restoreFromLocalStorage() {
   return font
 }
 
-function loadFont(fileName) {
-  return new Promise((resolve, reject) => {
-    const xhr = new XMLHttpRequest();
-    xhr.responseType = 'arraybuffer';
-    xhr.open('GET', fileName);
-    xhr.onload = () => {
-      if (xhr.status !== 200) {
-        reject(xhr.statusText);
-        return;
-      }
-      resolve(new Uint8Array(xhr.response));
-    };
-    xhr.onerror = (err) => reject(err);
-    xhr.send();
-  });
+const onLoadFont = (font) => {
+  state.numRows = (font.length / 256) | 0;
+  state.font = font;
+  setCanvasSizes();
+  renderFontCanvas();
+  renderCharacter();
+};
+
+
+/**
+ * fetch from url as arraybuffer, reject when http code is 400+
+ * @param url
+ * @returns {Promise<*>}
+ */
+async function loadFont(url) {
+  if (url.startsWith('data:image') || url.endsWith('.png') || url.endsWith('.svg')) {
+    const img = await loadImage(url);
+    const imgData = getImageData(img);
+    const data = convertImageData(imgData, 8, Math.floor(img.height / 16));
+    onLoadFont(data);
+  }
+
+  const response = await fetch(url);
+  if (response.status >= 400) {
+    throw new Error(`${response.status}: ${response.statusText}`);
+  }
+  const buf = await response.arrayBuffer();
+  onLoadFont(new Uint8ClampedArray(buf));
 }
+
+
 
 /**
  * Get a list of fonts that are available on the repo, via GitHub API
@@ -147,10 +162,9 @@ function loadOnlineFontList() {
 
 /**
  * Render the character table
- * @param {*} state the state object
- * @param {*} specificChar if specified, only a specific char is updated in the render.
+ * @param {number?} specificChar if specified, only a specific char is updated in the render.
  */
-function renderFontCanvas(state, specificChar) {
+function renderFontCanvas(specificChar) {
   const { pixelSize } = state;
   for (let y = 0; y < 16; y++) {
     for (let x = 0; x < 16; x++) {
@@ -181,7 +195,7 @@ function renderFontCanvas(state, specificChar) {
   }
 }
 
-function renderCharCursor(state) {
+function renderCharCursor() {
   const pixelSize = state.zoomPixelSize;
   const ctx = charCtx
   ctx.strokeStyle = 'deeppink'
@@ -196,7 +210,7 @@ function renderCharCursor(state) {
   ctx.stroke()
 }
 
-function renderCharacter(state) {
+function renderCharacter() {
   charCtx.clearRect(0, 0, charCanvas.width, charCanvas.height)
 
   const pixelSize = state.zoomPixelSize;
@@ -214,32 +228,26 @@ function renderCharacter(state) {
     }
   }
   if (document.activeElement === charCanvas) {
-    renderCharCursor(state)
+    renderCharCursor()
   }
 }
 
-function togglePixel(state) {
+function togglePixel() {
   const bit = 1 << (7 - state.x);
   const line = state.currentChar * state.numRows + state.y;
   state.font[line] ^= bit;
-  renderCharacter(state)
+  renderCharacter()
   screenreaderAnnouncePixel()
 }
 
-function setCanvasSizes(state) {
+function setCanvasSizes() {
   fontCanvas.width = 10 * state.pixelSize * 16;
   fontCanvas.height = (state.numRows + 2) * state.pixelSize * 16;
   charCanvas.width = 1 + 8 * (state.zoomPixelSize + 1);
   charCanvas.height = 1 + state.numRows * (state.zoomPixelSize + 1);
 }
 
-const onLoadFont = (font) => {
-  state.numRows = (font.length / 256) | 0;
-  state.font = font;
-  setCanvasSizes(state);
-  renderFontCanvas(state);
-  renderCharacter(state);
-};
+
 
 function setup() {
 
@@ -295,8 +303,7 @@ function setup() {
     if (selectOpen === 'local') {
       loadLocal();
     } else {
-      console.log('muh', selectOpen)
-      loadFont(selectOpen).then(onLoadFont);
+      loadFont(selectOpen)
     }
     $('#openDialog').close();
   });
@@ -310,10 +317,7 @@ function setup() {
     if (file.name.endsWith('.png')) {
       const reader = new FileReader()
       reader.onload = async () => {
-        const img = await loadImage(reader.result)
-        const imgData = getImageData(img)
-        const binData = convertImageData(imgData, 8, Math.floor(img.height / 16))
-        onLoadFont(binData)
+        await loadFont(reader.result)
       }
       reader.readAsDataURL(file)
       return;
@@ -321,7 +325,6 @@ function setup() {
     if (file.name.endsWith('.bin')) {
       const reader = new FileReader();
       reader.onload = () => {
-        console.log(reader.result);
         onLoadFont(new Uint8Array(reader.result));
       };
       reader.readAsArrayBuffer(file);
@@ -339,8 +342,8 @@ function setup() {
     const xIndex = (x / (10 * pixelSize)) | 0;
     const yIndex = (y / ((numRows + 2) * pixelSize)) | 0;
     state.currentChar = yIndex * 16 + xIndex;
-    renderFontCanvas(state);
-    renderCharacter(state);
+    renderFontCanvas();
+    renderCharacter();
   });
 
   charCanvas.addEventListener('click', (e) => {
@@ -349,14 +352,14 @@ function setup() {
     const y = e.clientY - charCanvas.offsetTop + window.scrollY;
     state.x = ((x - 1) / (pixelSize + 1)) | 0;
     state.y = ((y - 1) / (pixelSize + 1)) | 0;
-    togglePixel(state);
-    renderCharacter(state);
-    renderFontCanvas(state, state.currentChar);
-    saveToLocalStorage(state);
+    togglePixel();
+    renderCharacter();
+    renderFontCanvas(state.currentChar);
+    saveToLocalStorage();
   });
 
-  charCanvas.addEventListener('focusin', () => renderCharacter(state))
-  charCanvas.addEventListener('focusout', () => renderCharacter(state))
+  charCanvas.addEventListener('focusin', () => renderCharacter())
+  charCanvas.addEventListener('focusout', () => renderCharacter())
 
   fontCanvas.addEventListener('keydown', (e) => {
     if (e.code === 'ArrowUp') {
@@ -366,8 +369,8 @@ function setup() {
         state.currentChar += 256
       }
       screenreaderAnnounce(`character ${state.currentChar}`)
-      renderCharacter(state)
-      renderFontCanvas(state)
+      renderCharacter()
+      renderFontCanvas()
     }
     if (e.code === 'ArrowDown') {
       e.preventDefault();
@@ -376,8 +379,8 @@ function setup() {
         state.currentChar -= 256
       }
       screenreaderAnnounce(`character ${state.currentChar}`)
-      renderCharacter(state)
-      renderFontCanvas(state)
+      renderCharacter()
+      renderFontCanvas()
     }
     if (e.code === 'ArrowLeft') {
       e.preventDefault();
@@ -386,8 +389,8 @@ function setup() {
         state.currentChar += 256
       }
       screenreaderAnnounce(`character ${state.currentChar}`)
-      renderCharacter(state)
-      renderFontCanvas(state)
+      renderCharacter()
+      renderFontCanvas()
     }
     if (e.code === 'ArrowRight') {
       e.preventDefault();
@@ -396,8 +399,8 @@ function setup() {
         state.currentChar -= 256
       }
       screenreaderAnnounce(`character ${state.currentChar}`)
-      renderCharacter(state)
-      renderFontCanvas(state)
+      renderCharacter()
+      renderFontCanvas()
     }
   })
 
@@ -409,7 +412,7 @@ function setup() {
       } else {
         state.y = state.numRows - 1;
       }
-      renderCharacter(state)
+      renderCharacter()
       screenreaderAnnouncePixel()
       return
     }
@@ -420,7 +423,7 @@ function setup() {
       } else {
         state.y = 0;
       }
-      renderCharacter(state)
+      renderCharacter()
       screenreaderAnnouncePixel()
     }
 
@@ -431,7 +434,7 @@ function setup() {
       } else {
         state.x = state.numCols - 1
       }
-      renderCharacter(state)
+      renderCharacter()
       screenreaderAnnouncePixel()
     }
     if (e.code === 'ArrowRight') {
@@ -441,11 +444,11 @@ function setup() {
       } else {
         state.x = 0
       }
-      renderCharacter(state)
+      renderCharacter()
       screenreaderAnnouncePixel()
     }
     if (e.code === 'Space') {
-      togglePixel(state);
+      togglePixel();
       renderFontCanvas();
       e.preventDefault();
     }

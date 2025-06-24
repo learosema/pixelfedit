@@ -13,5 +13,7 @@ An open-source 8-Bit pixel font editor like I created in 1996.
 
 This project is built using the [Eleventy](https://11ty.dev) Static Site generator.
 
-Run `npm i` && `npm start` to install and run a local express server serving static files.
+Run `npm i` && `npm run dev` to install and run Eleventy.
+
+Right now, there is only one single page, but as soon as I feel I want to build more website around this tool, Eleventy will come in handy. Right now, the main use-case of Eleventy is to have a development server with hot refresh. Plus, it comes with easy extensibility to js/css preprocessor toolchains.
 

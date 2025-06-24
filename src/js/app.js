@@ -1,4 +1,5 @@
 import { createSVG, createPNG, createCHeaderFile } from './font-export/index.js';
+import { convertImageData, getImageData, loadImage } from './font-import/read-image.js';
 
 const $ = document.querySelector.bind(document);
 const $node = (markup = '<div></div>') => {
@@ -308,8 +309,13 @@ function setup() {
     }
     if (file.name.endsWith('.png')) {
       const reader = new FileReader()
-
-      // TOTHEFDO
+      reader.onload = async () => {
+        const img = await loadImage(reader.result)
+        const imgData = getImageData(img)
+        const binData = convertImageData(imgData, 8, Math.floor(img.height / 16))
+        onLoadFont(binData)
+      }
+      reader.readAsDataURL(file)
       return;
     }
     if (file.name.endsWith('.bin')) {

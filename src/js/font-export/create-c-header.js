@@ -14,12 +14,11 @@ export function createCHeaderFile(font) {
     code += '\n';
   }
   code += '};\n'
-  const output = `
-#ifndef FONTDATA_H__
-#define FONTDATA_H__
-#include <stdint.h>
-${code}
-#endif
-  `.trim(); + '\n';
+  const output = [
+    '#ifndef FONTDATA_H__',
+    '#define FONTDATA_H__',
+    code,
+    '#endif',
+  ].join('\n');
   return `data:text/plain,${encodeURIComponent(output)}`
 }

@@ -41,7 +41,7 @@ export class Image {
   shouldResolve = false
 
 
-  constructor(emit = null) {
+  constructor() {
     Image.#eventEmitter.on('load', () => {
       if (typeof this.onload === 'function') {
         this.onload.apply(this, [this]);

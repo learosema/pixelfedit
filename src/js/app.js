@@ -35,7 +35,7 @@ function screenreaderAnnounce(message) {
 function screenreaderAnnouncePixel() {
   const bit = 1 << (7 - state.x);
   const line = state.currentChar * state.numRows + state.y;
-  screenreaderAnnounce(`${state.x} ${state.y} ${(state.font[line] & bit) ? 'set':'unset'}`)
+  screenreaderAnnounce(`${state.x} ${state.y} ${(state.font[line] & bit) > 0 ? 'set':'unset'}`)
 }
 
 function saveBinary(font, filename = 'awesome-font.bin') {
@@ -79,7 +79,7 @@ function loadLocal() {
 }
 
 function saveToLocalStorage() {
-  const data = Array.from(state.font, (v) => v.toString(16).padStart(2, '0')).join('')
+  const data = Array.from(state.font, (v) => Number(v).toString(16).padStart(2, '0')).join('')
   localStorage.setItem('font', `${state.numCols}x${state.numRows} ${data}`)
 }
 
@@ -116,6 +116,7 @@ async function loadFont(url) {
     const imgData = getImageData(img);
     const data = convertImageData(imgData, 8, Math.floor(img.height / 16));
     onLoadFont(data);
+    return;
   }
 
   const response = await fetch(url);
@@ -126,38 +127,17 @@ async function loadFont(url) {
   onLoadFont(new Uint8ClampedArray(buf));
 }
 
-
-
 /**
  * Get a list of fonts that are available on the repo, via GitHub API
  */
-function loadOnlineFontList() {
-  return new Promise((resolve, reject) => {
-    const xhr = new XMLHttpRequest();
-    xhr.open(
-      'GET',
-      'https://api.github.com/repos/learosema/pixelfedit/contents/src/fonts'
-    );
-    xhr.onload = () => {
-      if (xhr.status !== 200) {
-        reject(xhr.statusText);
-        return;
-      }
-      try {
-        const data = JSON.parse(xhr.response).map((item) => ({
-          name: item.name,
-          path: 'fonts/' + item.name,
-          cols: 8,
-          rows: item.size / 256,
-        }));
-        resolve(data);
-      } catch (ex) {
-        reject(ex);
-      }
-    };
-    xhr.onerror = (err) => reject(err);
-    xhr.send();
-  });
+async function loadOnlineFontList() {
+  const response = await fetch(
+    'https://api.github.com/repos/learosema/pixelfedit/contents/src/fonts'
+  );
+  if (response.status >= 400) {
+    throw new Error(`${response.status}: ${response.statusText}`);
+  }
+  return await response.json();
 }
 
 /**
@@ -247,105 +227,18 @@ function setCanvasSizes() {
   charCanvas.height = 1 + state.numRows * (state.zoomPixelSize + 1);
 }
 
-
-
-function setup() {
-
-  loadOnlineFontList().then((data) => {
-    const selectOpen = $('#selectOpen');
-    data.map((item) => {
-      const $li = $node(`
-          <option value="${item.path}">
-            ${item.name}
-          </option>
-        `);
-      selectOpen.appendChild($li);
-    });
-  });
-
-  const restoredFont = restoreFromLocalStorage()
-  if (!restoredFont) {
-    loadFont('fonts/8X16.BIN').then(onLoadFont);
-  } else {
-    onLoadFont(restoredFont);
+function populateFontList(entries) {
+  const selectOpen = $('#selectOpen');
+  selectOpen.innerHTML = '<option value="local">local file</option>';
+  for (const item of entries) {
+    const $li = $node(`
+      <option value="fonts/${item.name}">${item.name}</option>
+    `);
+    selectOpen.appendChild($li);
   }
+}
 
-  $('#menuOpen').addEventListener('click', () => {
-    $('#openDialog').showModal();
-  });
-
-  $('#menuSave').addEventListener('click', () => {
-    $('#saveDialog').showModal();
-  });
-
-  $('#saveForm').addEventListener('submit', (e) => {
-    e.preventDefault();
-    const selectSaveFormat = $('#selectSaveFormat').value
-    switch (selectSaveFormat) {
-      case 'binary':
-        saveBinary(state.font);
-        break;
-      case 'png':
-        savePNG(state.font);
-        break;
-      case 'svg':
-        saveSVG(state.font);
-        break;
-      case 'c':
-        saveCode(state.font);
-    }
-    $('#saveDialog').close();
-  });
-
-  $('#openForm').addEventListener('submit', (e) => {
-    e.preventDefault();
-    const selectOpen = $('#selectOpen').value
-    if (selectOpen === 'local') {
-      loadLocal();
-    } else {
-      loadFont(selectOpen)
-    }
-    $('#openDialog').close();
-  });
-
-  $('#inputFile').addEventListener('change', () => {
-    const file = $('#inputFile').files[0];
-    // TODO: if file.name ends with .png then try to import?
-    if (!file || file instanceof Blob === false) {
-      return;
-    }
-    if (file.name.endsWith('.png')) {
-      const reader = new FileReader()
-      reader.onload = async () => {
-        await loadFont(reader.result)
-      }
-      reader.readAsDataURL(file)
-      return;
-    }
-    if (file.name.endsWith('.bin')) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        onLoadFont(new Uint8Array(reader.result));
-      };
-      reader.readAsArrayBuffer(file);
-    }
-
-  });
-
-  fontCanvas.addEventListener('click', (e) => {
-    if (!state.font) {
-      return;
-    }
-    const { pixelSize, numRows } = state;
-    const x = e.clientX - fontCanvas.offsetLeft + window.scrollX;
-    const y = e.clientY - fontCanvas.offsetTop + window.scrollY;
-    const xIndex = (x / (10 * pixelSize)) | 0;
-    const yIndex = (y / ((numRows + 2) * pixelSize)) | 0;
-    state.currentChar = yIndex * 16 + xIndex;
-    renderFontCanvas();
-    renderCharacter();
-  });
-
+function initCharCanvasEvents() {
   charCanvas.addEventListener('click', (e) => {
     const pixelSize = state.zoomPixelSize;
     const x = e.clientX - charCanvas.offsetLeft + window.scrollX;
@@ -358,51 +251,8 @@ function setup() {
     saveToLocalStorage();
   });
 
-  charCanvas.addEventListener('focusin', () => renderCharacter())
-  charCanvas.addEventListener('focusout', () => renderCharacter())
-
-  fontCanvas.addEventListener('keydown', (e) => {
-    if (e.code === 'ArrowUp') {
-      e.preventDefault();
-      state.currentChar -= 16;
-      if (state.currentChar < 0) {
-        state.currentChar += 256
-      }
-      screenreaderAnnounce(`character ${state.currentChar}`)
-      renderCharacter()
-      renderFontCanvas()
-    }
-    if (e.code === 'ArrowDown') {
-      e.preventDefault();
-      state.currentChar += 16;
-      if (state.currentChar > 255) {
-        state.currentChar -= 256
-      }
-      screenreaderAnnounce(`character ${state.currentChar}`)
-      renderCharacter()
-      renderFontCanvas()
-    }
-    if (e.code === 'ArrowLeft') {
-      e.preventDefault();
-      state.currentChar--;
-      if (state.currentChar < 0) {
-        state.currentChar += 256
-      }
-      screenreaderAnnounce(`character ${state.currentChar}`)
-      renderCharacter()
-      renderFontCanvas()
-    }
-    if (e.code === 'ArrowRight') {
-      e.preventDefault();
-      state.currentChar++;
-      if (state.currentChar > 255) {
-        state.currentChar -= 256
-      }
-      screenreaderAnnounce(`character ${state.currentChar}`)
-      renderCharacter()
-      renderFontCanvas()
-    }
-  })
+  charCanvas.addEventListener('focusin', () => renderCharacter());
+  charCanvas.addEventListener('focusout', () => renderCharacter());
 
   charCanvas.addEventListener('keydown', (e) => {
     if (e.code === 'ArrowUp') {
@@ -455,4 +305,145 @@ function setup() {
   })
 }
 
-setup();
+function initMenu() {
+  $('#menuOpen').addEventListener('click', () => {
+    loadOnlineFontList().then(populateFontList);
+    $('#openDialog').showModal();
+  });
+
+  $('#menuSave').addEventListener('click', () => {
+    $('#saveDialog').showModal();
+  });
+}
+
+function initFontCanvasEvents() {
+  fontCanvas.addEventListener('click', (e) => {
+    if (!state.font) {
+      return;
+    }
+    const { pixelSize, numRows } = state;
+    const x = e.clientX - fontCanvas.offsetLeft + window.scrollX;
+    const y = e.clientY - fontCanvas.offsetTop + window.scrollY;
+    const xIndex = (x / (10 * pixelSize)) | 0;
+    const yIndex = (y / ((numRows + 2) * pixelSize)) | 0;
+    state.currentChar = yIndex * 16 + xIndex;
+    renderFontCanvas();
+    renderCharacter();
+  });
+
+
+  fontCanvas.addEventListener('keydown', (e) => {
+    if (e.code === 'ArrowUp') {
+      e.preventDefault();
+      state.currentChar -= 16;
+      if (state.currentChar < 0) {
+        state.currentChar += 256;
+      }
+      screenreaderAnnounce(`character ${state.currentChar}`);
+      renderCharacter();
+      renderFontCanvas();
+    }
+    if (e.code === 'ArrowDown') {
+      e.preventDefault();
+      state.currentChar += 16;
+      if (state.currentChar > 255) {
+        state.currentChar -= 256;
+      }
+      screenreaderAnnounce(`character ${state.currentChar}`);
+      renderCharacter();
+      renderFontCanvas();
+    }
+    if (e.code === 'ArrowLeft') {
+      e.preventDefault();
+      state.currentChar--;
+      if (state.currentChar < 0) {
+        state.currentChar += 256;
+      }
+      screenreaderAnnounce(`character ${state.currentChar}`);
+      renderCharacter();
+      renderFontCanvas();
+    }
+    if (e.code === 'ArrowRight') {
+      e.preventDefault();
+      state.currentChar++;
+      if (state.currentChar > 255) {
+        state.currentChar -= 256;
+      }
+      screenreaderAnnounce(`character ${state.currentChar}`);
+      renderCharacter();
+      renderFontCanvas();
+    }
+  });
+}
+
+function initOpenDialog() {
+  $('#openForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const selectOpen = $('#selectOpen').value;
+    if (selectOpen === 'local') {
+      loadLocal();
+    } else {
+      loadFont(selectOpen);
+    }
+    $('#openDialog').close();
+  });
+
+  $('#inputFile').addEventListener('change', () => {
+    const file = $('#inputFile').files[0];
+    if (!file || !(file instanceof Blob)) {
+      return;
+    }
+    if (file.name.endsWith('.png')) {
+      const reader = new FileReader();
+      reader.onload = async () => {
+        await loadFont(reader.result);
+      };
+      reader.readAsDataURL(file);
+      return;
+    }
+    if (file.name.endsWith('.bin')) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        onLoadFont(new Uint8Array(reader.result));
+      };
+      reader.readAsArrayBuffer(file);
+    }
+  });
+}
+
+function initSaveDialog() {
+  $('#saveForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const selectSaveFormat = $('#selectSaveFormat').value;
+    switch (selectSaveFormat) {
+      case 'binary':
+        saveBinary(state.font);
+        break;
+      case 'png':
+        savePNG(state.font);
+        break;
+      case 'svg':
+        saveSVG(state.font);
+        break;
+      case 'c':
+        saveCode(state.font);
+    }
+    $('#saveDialog').close();
+  });
+}
+
+async function setup() {
+  const restoredFont = restoreFromLocalStorage()
+  if (!restoredFont) {
+    await loadFont('fonts/8X16.BIN');
+  } else {
+    onLoadFont(restoredFont);
+  }
+  initCharCanvasEvents();
+  initMenu();
+  initSaveDialog();
+  initOpenDialog();
+  initFontCanvasEvents();
+}
+
+setup().then(() => console.info('initialization successful'));

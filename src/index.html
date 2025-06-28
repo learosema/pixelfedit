@@ -6,6 +6,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="css/index.css" />
   <title>PixelFedit</title>
+  <script type="importmap">
+    {
+      "imports": {
+        "tinykeys": "https://esm.sh/tinykeys@3.0.0/"
+      }
+    }
+  </script>
 </head>
 
 <body>
@@ -34,9 +41,17 @@
         <h1>PixelFedit</h1>
       </li>
       <li>
+        <button class="text-button" id="menuCommand">
+          command palette
+          <kbd class="cmd">⌘</kbd>
+          <kbd class="ctrl">CTRL</kbd>
+          +
+          <kbd>P</kbd>
+        </button>
+      </li>
+      <li>
         <button class="text-icon-button" id="menuOpen">
-          <svg class="icon">
-            <title>Open</title>
+          <svg class="icon" aria-hidden="true">
             <use xlink:href="#open" />
           </svg>
           <span>open</span>
@@ -44,8 +59,7 @@
       </li>
       <li>
         <button class="text-icon-button" id="menuSave">
-          <svg class="icon">
-            <title>Save</title>
+          <svg class="icon" aria-hidden="true">
             <use xlink:href="#disk" />
           </svg>
           <span>save</span>
@@ -55,14 +69,17 @@
   </nav>
 
   <main class="main">
-    <div class="char-wrapper">
-      <canvas class="char-canvas" tabindex="0" aria-label="Character Detail Pixel Editor" aria-describedby="pixelEditorHelp"></canvas>
-      <p id="pixelEditorHelp" class="visually-hidden" aria-hidden="true">use cursor keys to navigate, use space to toggle pixels, pixels are announced</p>
-    </div>
-    <div class="font-wrapper">
+    <article class="char-wrapper flow">
+      <h2>Character Editor</h2>
+      <canvas class="char-canvas" tabindex="0" aria-labelledby="characterLabel" aria-describedby="pixelEditorHelp"></canvas>
+      <p id="characterLabel" class="character-label" aria-live="polite">Character 65: uppercase A</p>
+      <p id="pixelEditorHelp" class="help-text">use cursor keys to navigate, use space to toggle pixels, pixels are announced</p>
+    </article>
+    <article class="font-wrapper flow">
+      <h2>Character table</h2>
       <canvas class="font-canvas" tabindex="0" aria-label="Character Grid" aria-describedby="characterGridHelp"></canvas>
       <p id="characterGridHelp" class="visually-hidden" aria-hidden="true">use cursor keys to select a character</p>
-    </div>
+    </article>
   </main>
   <dialog class="dialog" id="openDialog">
     <h2>Open File</h2>
@@ -106,6 +123,33 @@
         <span class="visually-hidden">close</span>
       </button>
     </form>
+  </dialog>
+  <dialog class="dialog" id="commandPaletteDialog">
+    <h2>Command Palette</h2>
+    <form method="dialog">
+      <button class="close">
+        <svg aria-hidden="true" class="icon">
+          <use xlink:href="#close" />
+        </svg>
+        <span class="visually-hidden">close</span>
+      </button>
+    </form>
+    <form id="commandForm" action="#">
+      <div class="field">
+        <label for="commandInput" class="visually-hidden">Command:</label>
+        <input name="commandInput" id="commandInput">
+      </div>
+    </form>
+    <article class="help-text">
+      <h3>Available commands</h3>
+      <ul>
+        <li>open - open a file</li>
+        <li>save - save a file</li>
+        <li>clear [from][-to] - clear range of characters</li>
+        <li>sans-serif [from][-to] - interpolate character from system's sans-serif font</li>
+        <li>serif [from][-to] - interpolate character from system's sans-serif font</li>
+      </ul>
+    </article>
   </dialog>
   <div aria-live="polite" id="liveRegion" class="visually-hidden"></div>
   <script type="module" src="js/app.js"></script>

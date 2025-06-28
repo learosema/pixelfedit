@@ -1,6 +1,14 @@
 import { createSVG, createPNG, createCHeaderFile } from './font-export/index.js';
 import { convertImageData, getImageData, loadImage } from './font-import/read-image.js';
+import { generateFromFont } from './generative/gen-from-font.js';
 
+const CP437 = import('./encodings/cp437.js');
+const GEN = import('./generative/gen-from-font.js');
+
+const isMac = navigator.userAgent.toLowerCase().includes('mac');
+if (isMac) {
+  document.body.classList.add('mac');
+}
 const $ = document.querySelector.bind(document);
 const $node = (markup = '<div></div>') => {
   const el = document.createElement('div');
@@ -36,6 +44,25 @@ function screenreaderAnnouncePixel() {
   const bit = 1 << (7 - state.x);
   const line = state.currentChar * state.numRows + state.y;
   screenreaderAnnounce(`${state.x} ${state.y} ${(state.font[line] & bit) > 0 ? 'set':'unset'}`)
+}
+
+function clearChar(from, to) {
+  if (typeof from !== 'number') {
+    from = state.currentChar > -1 ? state.currentChar : 0;
+  }
+  if (typeof to !== 'number') {
+    to = from;
+  }
+  if (! state.font) {
+    return;
+  }
+  for (let i = from; i <= to; i++) {
+    for (let j = 0; j < state.numRows; j++) {
+      state.font[i*state.numRows + j] = 0;
+    }
+  }
+  renderFontCanvas();
+  renderCharacter();
 }
 
 function saveBinary(font, filename = 'awesome-font.bin') {
@@ -192,7 +219,10 @@ function renderCharCursor() {
 
 function renderCharacter() {
   charCtx.clearRect(0, 0, charCanvas.width, charCanvas.height)
-
+  CP437.then(({CP437_LABELS}) => {
+    $('#characterLabel').textContent =
+        `Character ${state.currentChar}: ${CP437_LABELS[state.currentChar]}`;
+  })
   const pixelSize = state.zoomPixelSize;
   const n = state.currentChar;
   for (let j = 0; j < state.numRows; j++) {
@@ -305,15 +335,103 @@ function initCharCanvasEvents() {
   })
 }
 
+function openCommandPalette() {
+  /** @type HTMLInputElement */
+  const input = $('#commandInput');
+  $('#commandPaletteDialog').showModal();
+  input.value = '';
+  input.focus();
+}
+
 function initMenu() {
   $('#menuOpen').addEventListener('click', () => {
     loadOnlineFontList().then(populateFontList);
     $('#openDialog').showModal();
   });
 
+  $('#menuCommand').addEventListener('click', () => {
+    openCommandPalette();
+  })
+
   $('#menuSave').addEventListener('click', () => {
     $('#saveDialog').showModal();
   });
+  import('tinykeys').then(({tinykeys}) => {
+    tinykeys(window, {"$mod+P": event => {
+      event.preventDefault();
+        openCommandPalette();
+      }})
+  })
+  $('#commandForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const cmd = $('#commandInput').value;
+    if (cmd === 'open') {
+      setTimeout(() => $('#openDialog').showModal(), 0)
+    }
+    if (cmd === 'save') {
+      setTimeout(() => $('#saveDialog').showModal(), 0)
+    }
+    if (cmd.startsWith('open ')) {
+      const fontUrl = cmd.slice(5);
+      if (fontUrl.startsWith('https://') || fontUrl.startsWith('http://')) {
+        loadFont(fontUrl).then(() => console.info('Font loaded'));
+      } else {
+        loadFont(`fonts/${fontUrl}`).then(() =>
+          console.info('Font loaded'));
+      }
+    }
+    if (cmd === 'clear') {
+       clearChar(state.currentChar);
+    }
+    if (cmd.startsWith('clear ')) {
+      const param = cmd.slice(6).split(/[- ]/)
+        .map(str => str.trim())
+        .filter(str => str !== '');
+      if (param.length === 3 && param[0] === 'except') {
+        clearChar(0, (Number(param[1]) || 1) - 1);
+        clearChar((Number(param[2]) || 0) + 1, 255);
+      }
+      if (param.length === 1) {
+        clearChar(Number(param[0]) || 0);
+      }
+      if (param.length === 2) {
+        clearChar(Number(param[0]) || 0, Number(param[1]) || 0);
+      }
+    }
+    if (cmd.startsWith('serif ')) {
+
+      const param = cmd.slice(6).split(/[- ]/)
+        .map(str => str.trim())
+        .filter(str => str !== '');
+      if (param.length === 3 && param[0] === 'except') {
+        const excludeA =  (Number(param[1]) || 1)
+        const excludeB =  (Number(param[2]) || 1)
+
+        generateFromFont(state,
+          'serif',
+          0, excludeA - 1,
+          8, state.numRows);
+
+        generateFromFont(state,
+          'serif',
+          from: excludeB + 1, 255,
+          8, state.numRows);
+
+      }
+      if (param.length === 1) {
+        const _to = Number(param[0]) || 0
+        generateFromFont(state, 'serif', _to, _to);
+      }
+      if (param.length === 2) {
+        const from = Number(param[0]) || 0
+        const _to = Number(param[1]) || 0
+        generateFromFont(state, 'serif', from, _to);
+      }
+      renderCharacter();
+      renderFontCanvas();
+    }
+    $('#commandPaletteDialog').close();
+  })
 }
 
 function initFontCanvasEvents() {
@@ -331,7 +449,6 @@ function initFontCanvasEvents() {
     renderCharacter();
   });
 
-
   fontCanvas.addEventListener('keydown', (e) => {
     if (e.code === 'ArrowUp') {
       e.preventDefault();
@@ -339,7 +456,6 @@ function initFontCanvasEvents() {
       if (state.currentChar < 0) {
         state.currentChar += 256;
       }
-      screenreaderAnnounce(`character ${state.currentChar}`);
       renderCharacter();
       renderFontCanvas();
     }
@@ -349,7 +465,6 @@ function initFontCanvasEvents() {
       if (state.currentChar > 255) {
         state.currentChar -= 256;
       }
-      screenreaderAnnounce(`character ${state.currentChar}`);
       renderCharacter();
       renderFontCanvas();
     }
@@ -359,7 +474,6 @@ function initFontCanvasEvents() {
       if (state.currentChar < 0) {
         state.currentChar += 256;
       }
-      screenreaderAnnounce(`character ${state.currentChar}`);
       renderCharacter();
       renderFontCanvas();
     }
@@ -369,7 +483,6 @@ function initFontCanvasEvents() {
       if (state.currentChar > 255) {
         state.currentChar -= 256;
       }
-      screenreaderAnnounce(`character ${state.currentChar}`);
       renderCharacter();
       renderFontCanvas();
     }

@@ -1,8 +1,30 @@
 @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
 
+:root {
+  --bg: #222;
+  --fg: #fff;
+  --nav-bg: #000000;
+  --button-bg: #8055aa;
+  --button-fg: #ffffff;
+  --button-active-bg: #ffd1ea;
+  --button-active-fg: #222222;
+  --focus-outline: currentColor;
+}
+
+
 *, *::before, *::after {
   margin: 0;
+  box-sizing: border-box;
 }
+
+body:not(.mac) .cmd {
+  display: none;
+}
+
+body.mac .ctrl {
+  display: none;
+}
+
 
 dialog {
   margin: auto;
@@ -12,16 +34,30 @@ dialog {
   outline: 0.125em solid var(--focus-outline, currentColor);
 }
 
+/* Animate focus outline */
+@media (prefers-reduced-motion: no-preference) {
+  :focus-visible {
+    transition: outline-offset 145ms cubic-bezier(0.25, 0, 0.4, 1);
+  }
+  :where(:not(:active)):focus-visible {
+    transition-duration: 0.25s;
+  }
+}
+
+:where(:not(:active)):focus-visible {
+  outline-offset: 5px;
+}
+
 *[tabindex] {
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
 }
 
 body {
-  background: #222;
-  color: #fff;
+  background: var(--bg);
+  color: var(--fg);
   font-family: sans-serif;
-  line-height: 1.8;
+  line-height: 1.5;
   margin: 0 auto;
   min-height: 100dvh;
   flex-direction: column;
@@ -44,11 +80,25 @@ button {
   padding: 0;
 }
 
+
+
 h1,
 h2,
 h3 {
   margin: 0;
   font-family: 'Press Start 2P', monospace;
+  max-width: 12ch;
+}
+
+.help-text {
+  font-size: 0.9em;
+  max-width: 50ch;
+}
+
+.character-label {
+  color: aquamarine;
+  font-weight: bold;
+  max-width: 30ch;
 }
 
 a:hover {
@@ -76,6 +126,10 @@ a:hover {
   margin: 0;
 }
 
+article > * + * {
+  margin-block-start: 1em;
+}
+
 /********************** Top navigation *****************/
 
 
@@ -89,7 +143,7 @@ a:hover {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 0.5rem;
+  gap: 1em;
   padding: 0;
   margin: 0;
 }
@@ -103,18 +157,45 @@ a:hover {
   align-items: center;
   font-size: 16px;
   cursor: pointer;
-  padding: 8px 16px;
+  padding: 0.5em 1em;
   text-decoration: none;
-  color: hotpink;
+  font-family: inherit;
   font-weight: bold;
   border-radius: 8px;
+  gap: 0.5ch;
+
+  color: var(--button-fg);
+  background-color: var(--button-bg);
 }
 
-.nav button:hover {
-  color: #000;
-  background: hotpink;
-  text-decoration: none;
+.nav button:active {
+  color: var(--button-active-fg);
+  background: var(--button-active-bg);
 }
+
+
+.nav button .icon {
+  width: 1.5em;
+  height: 1.5em;
+  display: block;
+}
+
+.nav button > kbd.cmd,
+.nav button > kbd.ctrl {
+  margin-inline-start: 1em;
+
+}
+
+.nav button > kbd {
+  display: flex;
+  align-items: center;
+  border: 1px solid currentColor;
+  border-radius: 0.25em;
+  padding: 0 0.25em;
+  font-weight: bold;
+  line-height: 1.2;
+}
+
 
 
 .icon {
@@ -186,6 +267,30 @@ a:hover {
   display: block;
   width: 32px;
   height: 32px;
+}
+
+.dialog input {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #000;
+  font-family: inherit;
+  border-radius: .25rem;
+}
+
+.dialog input#commandInput {
+  padding-left: calc(0.5rem + 2ch);
+}
+
+.dialog input#commandInput::after {
+  position: absolute;
+  top: 0;
+  left: 0;
+  content: '';
+  color: lime;
+  background: deeppink;
+  clip-path: polygon(33% 0, 100% 50%, 33% 100%, 0% 100%, 67% 51%, 0% 0%);
+  width: 16px;
+  height: 16px;
 }
 
 .visually-hidden {

@@ -399,7 +399,6 @@ function initMenu() {
       }
     }
     if (cmd.startsWith('serif ')) {
-
       const param = cmd.slice(6).split(/[- ]/)
         .map(str => str.trim())
         .filter(str => str !== '');
@@ -414,9 +413,8 @@ function initMenu() {
 
         generateFromFont(state,
           'serif',
-          from: excludeB + 1, 255,
+          excludeB + 1, 255,
           8, state.numRows);
-
       }
       if (param.length === 1) {
         const _to = Number(param[0]) || 0
@@ -430,6 +428,40 @@ function initMenu() {
       renderCharacter();
       renderFontCanvas();
     }
+    if (cmd.startsWith('sans-serif ')) {
+      const param = cmd.slice(11).split(/[- ]/)
+        .map(str => str.trim())
+        .filter(str => str !== '');
+      if (param.length === 3 && param[0] === 'except') {
+        const excludeA =  (Number(param[1]) || 1)
+        const excludeB =  (Number(param[2]) || 1)
+
+        generateFromFont(state,
+          'sans-serif',
+          0, excludeA - 1,
+          8, state.numRows);
+
+        generateFromFont(state,
+          'sans-serif',
+          excludeB + 1, 255,
+          8, state.numRows);
+      }
+      if (param.length === 1) {
+        const _to = Number(param[0]) || 0
+        generateFromFont(state, 'sans-serif', _to, _to);
+      }
+      if (param.length === 2) {
+        const from = Number(param[0]) || 0
+        const _to = Number(param[1]) || 0
+        generateFromFont(state, 'sans-serif', from, _to);
+      }
+      renderCharacter();
+      renderFontCanvas();
+    }
+
+
+
+
     $('#commandPaletteDialog').close();
   })
 }

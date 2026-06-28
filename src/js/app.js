@@ -27,6 +27,8 @@ const state = {
   numRows: 8,
   numCols: 8,
   font: null,
+  pixels: null,
+  encoding: 'cp437',
   currentChar: 65,
   pixelSize: 2,
   zoomPixelSize: 24,

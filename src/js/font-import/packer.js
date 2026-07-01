@@ -5,6 +5,7 @@
  * @param {number} width
  * @param {number} height
  * @param {number} numBPP
+ * @returns {Array<{id: number, char: string, pixels: Uint8Array}>}
  */
 export function unpackFont(bitmaskData, numChars, width, height, numBPP = 1) {
   const result = []
@@ -19,8 +20,8 @@ export function unpackFont(bitmaskData, numChars, width, height, numBPP = 1) {
         const xIndex = Math.floor((x * bpp) / 8);
         const bitIndex = (x * bpp) % 8;
         const mask = ((1<<bpp)-1);
-        const pixel = bitmaskData[bytesPerChar * charIndex + bytesPerRow * y + xIndex]
-
+        const pixel = (bitmaskData[bytesPerChar * charIndex + bytesPerRow * y + xIndex] >> bitIndex) & mask;
+        pixels[y*width + x] = pixel
       }
     }
     result.push({
@@ -29,6 +30,7 @@ export function unpackFont(bitmaskData, numChars, width, height, numBPP = 1) {
       pixels
     })
   }
+  return result;
 }
 
 function packFont() {

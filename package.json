@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "A pixel editor",
   "type": "module",
+  "files": ["src"],
   "scripts": {
     "dev": "eleventy --serve",
     "lint": "eslint src",
